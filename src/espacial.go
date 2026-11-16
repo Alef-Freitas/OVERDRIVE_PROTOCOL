@@ -4,6 +4,7 @@ package main
 
 import (
 	"slices"
+	"strings"
 	"time"
 )
 
@@ -22,7 +23,12 @@ const (
 	espZoomMin        = 0.25
 	espZoomMax        = 3.0
 	espZoomPasso      = 1.12
-	espHomeURL        = "https://www.google.com"
+	espURLPlaceholder = "Digite uma URL..."
+	espBarraAlt       = 26
+	vkBackspace       = 0x08
+	espMascaraPalavra = 0xFFFF
+	espPrimeiroCar    = 32
+	espRaioURL        = 6
 )
 
 type cardEspacial struct {
@@ -33,19 +39,21 @@ type cardEspacial struct {
 }
 
 type estadoEspacial struct {
-	cartoes    []cardEspacial
-	selecao    rectT
-	arrastando bool
-	movendo    bool
-	origemX    int32
-	origemY    int32
-	cardOrigem rectT
-	foco       int
-	aberto     int
-	zoom       float64
-	offsetX    int32
-	offsetY    int32
-	criacao    time.Time
+	cartoes     []cardEspacial
+	selecao     rectT
+	arrastando  bool
+	movendo     bool
+	origemX     int32
+	origemY     int32
+	cardOrigem  rectT
+	foco        int
+	aberto      int
+	editando    int
+	textoEdicao string
+	zoom        float64
+	offsetX     int32
+	offsetY     int32
+	criacao     time.Time
 }
 
 //nolint:gochecknoglobals // Estado unico do canvas espacial: UI single-window.
@@ -64,19 +72,21 @@ func espFecharPaineisInicio(app *app) {
 
 func espIniciar() {
 	espCanvas = estadoEspacial{
-		cartoes:    nil,
-		selecao:    rectT{},
-		arrastando: false,
-		movendo:    false,
-		origemX:    0,
-		origemY:    0,
-		cardOrigem: rectT{},
-		foco:       -1,
-		aberto:     -1,
-		zoom:       1,
-		offsetX:    0,
-		offsetY:    0,
-		criacao:    time.Time{},
+		cartoes:     nil,
+		selecao:     rectT{},
+		arrastando:  false,
+		movendo:     false,
+		origemX:     0,
+		origemY:     0,
+		cardOrigem:  rectT{},
+		foco:        -1,
+		aberto:      -1,
+		editando:    -1,
+		textoEdicao: "",
+		zoom:        1,
+		offsetX:     0,
+		offsetY:     0,
+		criacao:     time.Time{},
 	}
 }
 
@@ -112,17 +122,80 @@ func espCartaoEm(x, y int32) int {
 	return -1
 }
 
-func espAdicionar(retangulo rectT, url string) {
+func espAdicionar(retangulo rectT) {
 	if !espRectValido(retangulo) {
 		return
 	}
 
 	espCanvas.cartoes = append(espCanvas.cartoes, cardEspacial{
 		rect:   retangulo,
-		titulo: url,
-		url:    url,
+		titulo: "",
+		url:    "",
 		cr:     espBordaCard,
 	})
+
+	espCanvas.foco = len(espCanvas.cartoes) - 1
+	espCanvas.editando = espCanvas.foco
+	espCanvas.textoEdicao = ""
+}
+
+func espAreaURL(indice int) rectT {
+	if indice < 0 || indice >= len(espCanvas.cartoes) {
+		return rectT{}
+	}
+
+	area := espCanvas.cartoes[indice].rect
+
+	return rectT{
+		area.Left, area.Top - espBarraAlt,
+		area.Right, area.Top,
+	}
+}
+
+func espFinalizarEdicao() {
+	indice := espCanvas.editando
+	if indice < 0 || indice >= len(espCanvas.cartoes) {
+		espCanvas.editando = -1
+
+		return
+	}
+
+	url := strings.TrimSpace(espCanvas.textoEdicao)
+	espCanvas.cartoes[indice].url = url
+	espCanvas.cartoes[indice].titulo = url
+	espCanvas.editando = -1
+	espCanvas.textoEdicao = ""
+}
+
+func espInserirCaractere(car rune) {
+	espCanvas.textoEdicao += string(car)
+}
+
+func espApagarCaractere() {
+	texto := []rune(espCanvas.textoEdicao)
+	if len(texto) == 0 {
+		return
+	}
+
+	espCanvas.textoEdicao = string(texto[:len(texto)-1])
+}
+
+func espRemoverFoco() {
+	indice := espCanvas.foco
+	if indice < 0 || indice >= len(espCanvas.cartoes) {
+		return
+	}
+
+	espCanvas.cartoes = slices.Delete(espCanvas.cartoes, indice, indice+1)
+	if espCanvas.aberto == indice {
+		espCanvas.aberto = -1
+	}
+
+	if espCanvas.editando == indice {
+		espCanvas.editando = -1
+	}
+
+	espCanvas.foco = -1
 }
 
 func espBotaoSair(app *app) rectT {
@@ -162,9 +235,24 @@ func espMouseDown(app *app, x, y int32) {
 		return
 	}
 
+	if espCanvas.editando >= 0 {
+		espFinalizarEdicao()
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+	}
+
 	indice := espCartaoEm(x, y)
 	if indice >= 0 {
 		espCanvas.foco = indice
+
+		if espDentro(espAreaURL(indice), x, y) {
+			espCanvas.editando = indice
+			espCanvas.textoEdicao = espCanvas.cartoes[indice].url
+
+			pInvalidateRect.Call(app.hwnd, 0, 1)
+
+			return
+		}
+
 		espCanvas.movendo = true
 		espCanvas.origemX = x
 		espCanvas.origemY = y
@@ -228,10 +316,6 @@ func espMouseUp(app *app, x, y int32) {
 
 		pReleaseCapture.Call()
 
-		if !espCanvas.arrastando && espCanvas.foco >= 0 {
-			espAbrirCard(app, espCanvas.foco)
-		}
-
 		return
 	}
 
@@ -245,12 +329,92 @@ func espMouseUp(app *app, x, y int32) {
 
 	retangulo := espNormalizar(espCanvas.origemX, espCanvas.origemY, x, y)
 	if espRectValido(retangulo) {
-		espAdicionar(retangulo, espHomeURL)
+		espAdicionar(retangulo)
 	}
 
 	espCanvas.selecao = rectT{}
 
 	pInvalidateRect.Call(app.hwnd, 0, 1)
+}
+
+func espDuploClique(app *app, x, y int32) {
+	if app == nil {
+		return
+	}
+
+	indice := espCartaoEm(x, y)
+	if indice < 0 {
+		return
+	}
+
+	espCanvas.foco = indice
+	espAbrirCard(app, indice)
+	pInvalidateRect.Call(app.hwnd, 0, 1)
+}
+
+func espTeclaChar(app *app, wparam uintptr) bool {
+	if espCanvas.editando < 0 {
+		return false
+	}
+
+	car := rune(wparam & espMascaraPalavra)
+	if car >= espPrimeiroCar {
+		espInserirCaractere(car)
+	}
+
+	pInvalidateRect.Call(app.hwnd, 0, 1)
+
+	return true
+}
+
+func espTeclaEdicao(tecla uint32) bool {
+	switch tecla {
+	case vkReturn:
+		espFinalizarEdicao()
+	case vkBackspace:
+		espApagarCaractere()
+	case vkEscape:
+		espCanvas.editando = -1
+		espCanvas.textoEdicao = ""
+	default:
+		return false
+	}
+
+	return true
+}
+
+func espTecla(app *app, mensagem uint32, wparam uintptr) bool {
+	if app == nil {
+		return false
+	}
+
+	if mensagem == wmChar {
+		return espTeclaChar(app, wparam)
+	}
+
+	if mensagem != wmKeyDown {
+		return false
+	}
+
+	tecla := uint32(wparam & espMascaraPalavra)
+	if espCanvas.editando >= 0 {
+		if !espTeclaEdicao(tecla) {
+			return false
+		}
+
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+
+		return true
+	}
+
+	if tecla == vkDelete {
+		espRemoverFoco()
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+
+		return true
+	}
+
+	return false
 }
 
 func espAbrirCard(app *app, indice int) bool {
@@ -307,6 +471,35 @@ func espOcultarWebView(app *app) {
 	setPaneVisible(app.left, false)
 }
 
+func espPintarBarraURL(disp *d2dMotor, indice int) {
+	areaURL := espAreaURL(indice)
+	if areaURL.Width() <= 0 {
+		return
+	}
+
+	corURL := uint32(espBordaCard)
+	if indice == espCanvas.editando {
+		corURL = espBordaFoco
+	}
+
+	disp.redondo(areaURL, espRaioURL, espFundoCard, corURL)
+
+	textoURL := espCanvas.cartoes[indice].url
+	if indice == espCanvas.editando {
+		textoURL = espCanvas.textoEdicao
+	}
+
+	if textoURL == "" {
+		textoURL = espURLPlaceholder
+	}
+
+	areaTexto := rectT{
+		areaURL.Left + espMargem, areaURL.Top,
+		areaURL.Right - espMargem, areaURL.Bottom,
+	}
+	disp.textoUI(textoURL, areaTexto, espCorTitulo, true, false)
+}
+
 func espPintar(disp *d2dMotor, app *app) {
 	if disp == nil || app == nil {
 		return
@@ -318,15 +511,8 @@ func espPintar(disp *d2dMotor, app *app) {
 			corBorda = espBordaFoco
 		}
 
+		espPintarBarraURL(disp, indice)
 		disp.redondo(card.rect, espCardRaio, espFundoCard, corBorda)
-
-		titulo := rectT{
-			card.rect.Left + espMargem,
-			card.rect.Top + espMargem,
-			card.rect.Right - espMargem,
-			card.rect.Top + espTituloAlt,
-		}
-		disp.textoUI(card.titulo, titulo, espCorTitulo, true, false)
 	}
 
 	if espCanvas.selecao.Width() > 0 && espCanvas.selecao.Height() > 0 {

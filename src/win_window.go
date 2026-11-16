@@ -559,7 +559,8 @@ func (a *app) cuidarCliqueJanela(hwnd uintptr, msg uint32, wparam, lparam uintpt
 
 		return 0, true
 	case wmLButtonDblClk:
-		a.cuidarDuploCliqueJanela(hwnd, lparam)
+		// a.cuidarDuploCliqueJanela(hwnd, lparam)
+		espDuploClique(a, loword(lparam), hiword(lparam))
 
 		return 0, true
 	case wmNcLButtonDblClk:
@@ -841,7 +842,11 @@ func (a *app) cuidarMensagensFinais(hwnd uintptr, msg uint32, wparam, lparam uin
 		return a.cuidarRodaJanela(wparam)
 	case wmCtlColorEdit, wmCtlColorStatic, wmKillFocus, wmDpiChanged, wmGetMinMaxInfo, wmCommand, wmClose, wmDestroy:
 		return a.cuidarSistemaJanela(hwnd, msg, wparam, lparam)
-	case wmActivate, wmHotKey, wmKeyDown, wmSysKeyDown:
+	case wmActivate, wmHotKey, wmKeyDown, wmSysKeyDown, wmChar:
+		if espTecla(a, msg, wparam) {
+			return 0, true
+		}
+
 		return a.cuidarFimJanela(msg, wparam, lparam)
 	default:
 		return 0, false
@@ -1870,14 +1875,15 @@ func aplicarEstiloJanela(hwnd uintptr) {
 	pSetWindowTheme.Call(hwnd, uintptr(unsafe.Pointer(utf16("DarkMode_Explorer"))), 0)
 }
 
-func (a *app) finalizarCriacaoJanela(hwnd, hInst, hIcon uintptr) {
+func (a *app) finalizarCriacaoJanela(hwnd, _ uintptr, hIcon uintptr) {
 	a.dpi = dpiForWindow(hwnd)
 	a.initBrushes()
 	a.initFonts()
 	a.tbHeight = a.sc(28)
-	a.criarCampoEndereco(hwnd, hInst)
+	// a.criarCampoEndereco(hwnd, hInst)
 	pShowWindow.Call(hwnd, swShow)
 	pUpdateWindow.Call(hwnd)
+	pSetFocus.Call(hwnd)
 
 	if hIcon != 0 {
 		pSendMessageW.Call(hwnd, wmSetIcon, iconBig, hIcon)
