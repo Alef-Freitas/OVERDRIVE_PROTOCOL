@@ -725,7 +725,8 @@ func navegarPaneNovo(w *WebView, url string) {
 	if url != "" && !strings.HasPrefix(url, "about:") {
 		w.Navigate(url)
 	} else {
-		w.NavigateToString(startPageHTML)
+		// w.NavigateToString(startPageHTML)
+		w.Navigate("about:blank")
 	}
 }
 
@@ -761,6 +762,7 @@ func (a *app) tratarPaneNovoAba(aba *tab, gen int, concluir func(), w *WebView) 
 	a.acolherPaneNovo(aba, p, w, url)
 	a.exibirPaneNovo(aba, p)
 	navegarPaneNovo(w, url)
+	espPosicionarWebView(a)
 
 	if a.st.WebviewUnica && a.ativa == a.indiceDaAba(aba) {
 		a.descartarAbasInativas(0)
@@ -1501,7 +1503,7 @@ func (a *app) invalidateFaixa() {
 
 func (a *app) restaurarAbas() {
 	a.ativa = -1
-	a.novaAba("", true)
+	// a.novaAba("", true)
 }
 
 func (a *app) novaJanela(extra string) {

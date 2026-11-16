@@ -2551,7 +2551,8 @@ func main() {
 	}()
 
 	aplicativo.st = loadState()
-	clipAutoLimpar = aplicativo.st.LimparClip
+
+	espFecharPaineisInicio(aplicativo)
 
 	aplicativo.restaurarGuiasFechadas()
 

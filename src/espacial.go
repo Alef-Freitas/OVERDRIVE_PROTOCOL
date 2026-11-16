@@ -51,6 +51,17 @@ type estadoEspacial struct {
 //nolint:gochecknoglobals // Estado unico do canvas espacial: UI single-window.
 var espCanvas estadoEspacial
 
+func espFecharPaineisInicio(app *app) {
+	if app == nil {
+		return
+	}
+
+	app.st.RightVisible = false
+	app.st.LeftPanelVisible = false
+	app.st.ImgVisible = false
+	clipAutoLimpar = app.st.LimparClip
+}
+
 func espIniciar() {
 	espCanvas = estadoEspacial{
 		cartoes:    nil,
@@ -252,14 +263,15 @@ func espAbrirCard(app *app, indice int) bool {
 		return false
 	}
 
+	espCanvas.aberto = indice
+
 	if app.left == nil || app.left.wv == nil || !app.left.ready {
-		return false
+		app.novaAba(card.url, true)
+
+		return true
 	}
 
 	app.left.wv.Navigate(card.url)
-
-	espCanvas.aberto = indice
-
 	espPosicionarWebView(app)
 
 	return true
