@@ -1,3 +1,4 @@
 *.exe
-*.emuso
-temp/
+*.exe~
+browser/data/
+browser/config/

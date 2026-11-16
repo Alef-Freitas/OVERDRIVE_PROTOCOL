@@ -1,0 +1,363 @@
+2026-11-16 15:03:50 [cheia] sem url :: execucao
+2026-11-16 15:03:50 [cheia] sem url :: resposta
+2026-11-16 15:03:50 [cheia] sem url :: resposta
+2026-11-16 15:03:50 [cheia] sem url :: resposta
+2026-11-16 15:03:50 [magra] sem url :: falha desconhecida
+2026-11-16 15:03:50 [magra] sem url :: resposta
+2026-11-16 15:03:50 [magra] sem url :: resposta
+2026-11-16 15:03:50 [teste] sem url :: falha desconhecida
+2026-11-16 15:03:50 [magra] sem url :: falha desconhecida
+2026-11-16 15:04:09 [cheia] sem url :: execucao
+2026-11-16 15:04:09 [cheia] sem url :: resposta
+2026-11-16 15:04:09 [cheia] sem url :: resposta
+2026-11-16 15:04:09 [cheia] sem url :: resposta
+2026-11-16 15:04:09 [magra] sem url :: falha desconhecida
+2026-11-16 15:04:09 [magra] sem url :: resposta
+2026-11-16 15:04:09 [magra] sem url :: resposta
+2026-11-16 15:04:09 [teste] sem url :: falha desconhecida
+2026-11-16 15:04:09 [magra] sem url :: falha desconhecida
+2026-11-16 15:05:21 [cheia] sem url :: execucao
+2026-11-16 15:05:21 [cheia] sem url :: resposta
+2026-11-16 15:05:21 [cheia] sem url :: resposta
+2026-11-16 15:05:21 [cheia] sem url :: resposta
+2026-11-16 15:05:21 [magra] sem url :: falha desconhecida
+2026-11-16 15:05:21 [magra] sem url :: resposta
+2026-11-16 15:05:21 [magra] sem url :: resposta
+2026-11-16 15:05:21 [teste] sem url :: falha desconhecida
+2026-11-16 15:05:21 [magra] sem url :: falha desconhecida
+2026-11-16 15:09:22 [cheia] sem url :: execucao
+2026-11-16 15:09:22 [cheia] sem url :: resposta
+2026-11-16 15:09:22 [cheia] sem url :: resposta
+2026-11-16 15:09:22 [cheia] sem url :: resposta
+2026-11-16 15:09:22 [magra] sem url :: falha desconhecida
+2026-11-16 15:09:22 [magra] sem url :: resposta
+2026-11-16 15:09:22 [magra] sem url :: resposta
+2026-11-16 15:09:22 [teste] sem url :: falha desconhecida
+2026-11-16 15:09:22 [magra] sem url :: falha desconhecida
+2026-11-16 15:09:41 [cheia] sem url :: execucao
+2026-11-16 15:09:41 [cheia] sem url :: resposta
+2026-11-16 15:09:41 [cheia] sem url :: resposta
+2026-11-16 15:09:41 [cheia] sem url :: resposta
+2026-11-16 15:09:41 [magra] sem url :: falha desconhecida
+2026-11-16 15:09:41 [magra] sem url :: resposta
+2026-11-16 15:09:41 [magra] sem url :: resposta
+2026-11-16 15:09:41 [teste] sem url :: falha desconhecida
+2026-11-16 15:09:41 [magra] sem url :: falha desconhecida
+2026-11-16 15:11:00 [cheia] sem url :: execucao
+2026-11-16 15:11:00 [cheia] sem url :: resposta
+2026-11-16 15:11:00 [cheia] sem url :: resposta
+2026-11-16 15:11:00 [cheia] sem url :: resposta
+2026-11-16 15:11:00 [magra] sem url :: falha desconhecida
+2026-11-16 15:11:00 [magra] sem url :: resposta
+2026-11-16 15:11:00 [magra] sem url :: resposta
+2026-11-16 15:11:00 [teste] sem url :: falha desconhecida
+2026-11-16 15:11:00 [magra] sem url :: falha desconhecida
+2026-11-16 15:16:30 [cheia] sem url :: execucao
+2026-11-16 15:16:30 [cheia] sem url :: resposta
+2026-11-16 15:16:30 [cheia] sem url :: resposta
+2026-11-16 15:16:30 [cheia] sem url :: resposta
+2026-11-16 15:16:30 [magra] sem url :: falha desconhecida
+2026-11-16 15:16:30 [magra] sem url :: resposta
+2026-11-16 15:16:30 [magra] sem url :: resposta
+2026-11-16 15:16:30 [teste] sem url :: falha desconhecida
+2026-11-16 15:16:30 [magra] sem url :: falha desconhecida
+2026-11-16 15:16:52 [cheia] sem url :: execucao
+2026-11-16 15:16:52 [cheia] sem url :: resposta
+2026-11-16 15:16:52 [cheia] sem url :: resposta
+2026-11-16 15:16:52 [cheia] sem url :: resposta
+2026-11-16 15:16:52 [magra] sem url :: falha desconhecida
+2026-11-16 15:16:52 [magra] sem url :: resposta
+2026-11-16 15:16:52 [magra] sem url :: resposta
+2026-11-16 15:16:52 [teste] sem url :: falha desconhecida
+2026-11-16 15:16:52 [magra] sem url :: falha desconhecida
+2026-11-16 15:18:08 [cheia] sem url :: execucao
+2026-11-16 15:18:08 [cheia] sem url :: resposta
+2026-11-16 15:18:08 [cheia] sem url :: resposta
+2026-11-16 15:18:08 [cheia] sem url :: resposta
+2026-11-16 15:18:08 [magra] sem url :: falha desconhecida
+2026-11-16 15:18:08 [magra] sem url :: resposta
+2026-11-16 15:18:08 [magra] sem url :: resposta
+2026-11-16 15:18:08 [teste] sem url :: falha desconhecida
+2026-11-16 15:18:08 [magra] sem url :: falha desconhecida
+2026-11-16 15:21:32 [cheia] sem url :: execucao
+2026-11-16 15:21:32 [cheia] sem url :: resposta
+2026-11-16 15:21:32 [cheia] sem url :: resposta
+2026-11-16 15:21:32 [cheia] sem url :: resposta
+2026-11-16 15:21:32 [magra] sem url :: falha desconhecida
+2026-11-16 15:21:32 [magra] sem url :: resposta
+2026-11-16 15:21:32 [magra] sem url :: resposta
+2026-11-16 15:21:32 [teste] sem url :: falha desconhecida
+2026-11-16 15:21:32 [magra] sem url :: falha desconhecida
+2026-11-16 15:21:44 [cheia] sem url :: execucao
+2026-11-16 15:21:44 [cheia] sem url :: resposta
+2026-11-16 15:21:44 [cheia] sem url :: resposta
+2026-11-16 15:21:44 [cheia] sem url :: resposta
+2026-11-16 15:21:44 [magra] sem url :: falha desconhecida
+2026-11-16 15:21:44 [magra] sem url :: resposta
+2026-11-16 15:21:44 [magra] sem url :: resposta
+2026-11-16 15:21:44 [teste] sem url :: falha desconhecida
+2026-11-16 15:21:44 [magra] sem url :: falha desconhecida
+2026-11-16 15:22:40 [cheia] sem url :: execucao
+2026-11-16 15:22:40 [cheia] sem url :: resposta
+2026-11-16 15:22:40 [cheia] sem url :: resposta
+2026-11-16 15:22:40 [cheia] sem url :: resposta
+2026-11-16 15:22:40 [magra] sem url :: falha desconhecida
+2026-11-16 15:22:40 [magra] sem url :: resposta
+2026-11-16 15:22:40 [magra] sem url :: resposta
+2026-11-16 15:22:40 [teste] sem url :: falha desconhecida
+2026-11-16 15:22:40 [magra] sem url :: falha desconhecida
+2026-11-16 15:25:36 [cheia] sem url :: execucao
+2026-11-16 15:25:36 [cheia] sem url :: resposta
+2026-11-16 15:25:36 [cheia] sem url :: resposta
+2026-11-16 15:25:36 [cheia] sem url :: resposta
+2026-11-16 15:25:36 [magra] sem url :: falha desconhecida
+2026-11-16 15:25:36 [magra] sem url :: resposta
+2026-11-16 15:25:36 [magra] sem url :: resposta
+2026-11-16 15:25:36 [teste] sem url :: falha desconhecida
+2026-11-16 15:25:36 [magra] sem url :: falha desconhecida
+2026-11-16 15:25:49 [cheia] sem url :: execucao
+2026-11-16 15:25:49 [cheia] sem url :: resposta
+2026-11-16 15:25:49 [cheia] sem url :: resposta
+2026-11-16 15:25:49 [cheia] sem url :: resposta
+2026-11-16 15:25:49 [magra] sem url :: falha desconhecida
+2026-11-16 15:25:49 [magra] sem url :: resposta
+2026-11-16 15:25:49 [magra] sem url :: resposta
+2026-11-16 15:25:49 [teste] sem url :: falha desconhecida
+2026-11-16 15:25:49 [magra] sem url :: falha desconhecida
+2026-11-16 15:26:47 [cheia] sem url :: execucao
+2026-11-16 15:26:47 [cheia] sem url :: resposta
+2026-11-16 15:26:47 [cheia] sem url :: resposta
+2026-11-16 15:26:47 [cheia] sem url :: resposta
+2026-11-16 15:26:47 [magra] sem url :: falha desconhecida
+2026-11-16 15:26:47 [magra] sem url :: resposta
+2026-11-16 15:26:47 [magra] sem url :: resposta
+2026-11-16 15:26:47 [teste] sem url :: falha desconhecida
+2026-11-16 15:26:47 [magra] sem url :: falha desconhecida
+2026-11-16 15:33:11 [cheia] sem url :: execucao
+2026-11-16 15:33:11 [cheia] sem url :: resposta
+2026-11-16 15:33:11 [cheia] sem url :: resposta
+2026-11-16 15:33:11 [cheia] sem url :: resposta
+2026-11-16 15:33:11 [magra] sem url :: falha desconhecida
+2026-11-16 15:33:11 [magra] sem url :: resposta
+2026-11-16 15:33:11 [magra] sem url :: resposta
+2026-11-16 15:33:11 [teste] sem url :: falha desconhecida
+2026-11-16 15:33:11 [magra] sem url :: falha desconhecida
+2026-11-16 15:33:24 [cheia] sem url :: execucao
+2026-11-16 15:33:24 [cheia] sem url :: resposta
+2026-11-16 15:33:24 [cheia] sem url :: resposta
+2026-11-16 15:33:24 [cheia] sem url :: resposta
+2026-11-16 15:33:24 [magra] sem url :: falha desconhecida
+2026-11-16 15:33:24 [magra] sem url :: resposta
+2026-11-16 15:33:24 [magra] sem url :: resposta
+2026-11-16 15:33:24 [teste] sem url :: falha desconhecida
+2026-11-16 15:33:24 [magra] sem url :: falha desconhecida
+2026-11-16 15:34:17 [cheia] sem url :: execucao
+2026-11-16 15:34:17 [cheia] sem url :: resposta
+2026-11-16 15:34:17 [cheia] sem url :: resposta
+2026-11-16 15:34:17 [cheia] sem url :: resposta
+2026-11-16 15:34:17 [magra] sem url :: falha desconhecida
+2026-11-16 15:34:17 [magra] sem url :: resposta
+2026-11-16 15:34:17 [magra] sem url :: resposta
+2026-11-16 15:34:17 [teste] sem url :: falha desconhecida
+2026-11-16 15:34:17 [magra] sem url :: falha desconhecida
+2026-11-16 15:39:47 [injecao] sem url :: falha desconhecida
+2026-11-16 15:39:47 [injecao] sem url :: x
+2026-11-16 15:39:47 [cheia] sem url :: execucao
+2026-11-16 15:39:47 [cheia] sem url :: resposta
+2026-11-16 15:39:47 [cheia] sem url :: resposta
+2026-11-16 15:39:47 [cheia] sem url :: resposta
+2026-11-16 15:39:47 [magra] sem url :: falha desconhecida
+2026-11-16 15:39:47 [magra] sem url :: resposta
+2026-11-16 15:39:47 [magra] sem url :: resposta
+2026-11-16 15:39:47 [teste] sem url :: falha desconhecida
+2026-11-16 15:39:47 [magra] sem url :: falha desconhecida
+2026-11-16 15:40:22 [injecao] sem url :: falha desconhecida
+2026-11-16 15:40:22 [injecao] sem url :: x
+2026-11-16 15:40:22 [cheia] sem url :: execucao
+2026-11-16 15:40:22 [cheia] sem url :: resposta
+2026-11-16 15:40:22 [cheia] sem url :: resposta
+2026-11-16 15:40:22 [cheia] sem url :: resposta
+2026-11-16 15:40:22 [magra] sem url :: falha desconhecida
+2026-11-16 15:40:22 [magra] sem url :: resposta
+2026-11-16 15:40:22 [magra] sem url :: resposta
+2026-11-16 15:40:22 [teste] sem url :: falha desconhecida
+2026-11-16 15:40:22 [magra] sem url :: falha desconhecida
+2026-11-16 15:41:28 [injecao] sem url :: falha desconhecida
+2026-11-16 15:41:28 [injecao] sem url :: x
+2026-11-16 15:41:28 [cheia] sem url :: execucao
+2026-11-16 15:41:28 [cheia] sem url :: resposta
+2026-11-16 15:41:28 [cheia] sem url :: resposta
+2026-11-16 15:41:28 [cheia] sem url :: resposta
+2026-11-16 15:41:28 [magra] sem url :: falha desconhecida
+2026-11-16 15:41:28 [magra] sem url :: resposta
+2026-11-16 15:41:28 [magra] sem url :: resposta
+2026-11-16 15:41:28 [teste] sem url :: falha desconhecida
+2026-11-16 15:41:28 [magra] sem url :: falha desconhecida
+2026-11-16 15:48:31 [injecao] sem url :: falha desconhecida
+2026-11-16 15:48:31 [injecao] sem url :: x
+2026-11-16 15:48:31 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:48:31 [cheia] sem url :: execucao
+2026-11-16 15:48:31 [cheia] sem url :: resposta
+2026-11-16 15:48:31 [cheia] sem url :: resposta
+2026-11-16 15:48:31 [cheia] sem url :: resposta
+2026-11-16 15:48:31 [magra] sem url :: falha desconhecida
+2026-11-16 15:48:31 [magra] sem url :: resposta
+2026-11-16 15:48:31 [magra] sem url :: resposta
+2026-11-16 15:48:31 [teste] sem url :: falha desconhecida
+2026-11-16 15:48:31 [magra] sem url :: falha desconhecida
+2026-11-16 15:48:50 [injecao] sem url :: falha desconhecida
+2026-11-16 15:48:50 [injecao] sem url :: x
+2026-11-16 15:48:50 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:48:50 [cheia] sem url :: execucao
+2026-11-16 15:48:50 [cheia] sem url :: resposta
+2026-11-16 15:48:50 [cheia] sem url :: resposta
+2026-11-16 15:48:50 [cheia] sem url :: resposta
+2026-11-16 15:48:50 [magra] sem url :: falha desconhecida
+2026-11-16 15:48:50 [magra] sem url :: resposta
+2026-11-16 15:48:50 [magra] sem url :: resposta
+2026-11-16 15:48:50 [teste] sem url :: falha desconhecida
+2026-11-16 15:48:50 [magra] sem url :: falha desconhecida
+2026-11-16 15:50:04 [injecao] sem url :: falha desconhecida
+2026-11-16 15:50:04 [injecao] sem url :: x
+2026-11-16 15:50:04 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:50:04 [cheia] sem url :: execucao
+2026-11-16 15:50:04 [cheia] sem url :: resposta
+2026-11-16 15:50:04 [cheia] sem url :: resposta
+2026-11-16 15:50:04 [cheia] sem url :: resposta
+2026-11-16 15:50:04 [magra] sem url :: falha desconhecida
+2026-11-16 15:50:04 [magra] sem url :: resposta
+2026-11-16 15:50:04 [magra] sem url :: resposta
+2026-11-16 15:50:04 [teste] sem url :: falha desconhecida
+2026-11-16 15:50:04 [magra] sem url :: falha desconhecida
+2026-11-16 15:51:03 [injecao] sem url :: falha desconhecida
+2026-11-16 15:51:03 [injecao] sem url :: x
+2026-11-16 15:51:03 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:51:03 [cheia] sem url :: execucao
+2026-11-16 15:51:03 [cheia] sem url :: resposta
+2026-11-16 15:51:03 [cheia] sem url :: resposta
+2026-11-16 15:51:03 [cheia] sem url :: resposta
+2026-11-16 15:51:03 [magra] sem url :: falha desconhecida
+2026-11-16 15:51:03 [magra] sem url :: resposta
+2026-11-16 15:51:03 [magra] sem url :: resposta
+2026-11-16 15:51:03 [teste] sem url :: falha desconhecida
+2026-11-16 15:51:03 [magra] sem url :: falha desconhecida
+2026-11-16 15:52:08 [injecao] sem url :: falha desconhecida
+2026-11-16 15:52:08 [injecao] sem url :: x
+2026-11-16 15:52:08 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:52:08 [cheia] sem url :: execucao
+2026-11-16 15:52:08 [cheia] sem url :: resposta
+2026-11-16 15:52:08 [cheia] sem url :: resposta
+2026-11-16 15:52:08 [cheia] sem url :: resposta
+2026-11-16 15:52:08 [magra] sem url :: falha desconhecida
+2026-11-16 15:52:08 [magra] sem url :: resposta
+2026-11-16 15:52:08 [magra] sem url :: resposta
+2026-11-16 15:52:08 [teste] sem url :: falha desconhecida
+2026-11-16 15:52:08 [magra] sem url :: falha desconhecida
+2026-11-16 15:58:55 [injecao] sem url :: falha desconhecida
+2026-11-16 15:58:55 [injecao] sem url :: x
+2026-11-16 15:58:55 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:58:55 [cheia] sem url :: execucao
+2026-11-16 15:58:55 [cheia] sem url :: resposta
+2026-11-16 15:58:55 [cheia] sem url :: resposta
+2026-11-16 15:58:55 [cheia] sem url :: resposta
+2026-11-16 15:58:55 [magra] sem url :: falha desconhecida
+2026-11-16 15:58:55 [magra] sem url :: resposta
+2026-11-16 15:58:55 [magra] sem url :: resposta
+2026-11-16 15:58:55 [teste] sem url :: falha desconhecida
+2026-11-16 15:58:55 [magra] sem url :: falha desconhecida
+2026-11-16 15:59:13 [injecao] sem url :: falha desconhecida
+2026-11-16 15:59:13 [injecao] sem url :: x
+2026-11-16 15:59:13 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 15:59:13 [cheia] sem url :: execucao
+2026-11-16 15:59:13 [cheia] sem url :: resposta
+2026-11-16 15:59:13 [cheia] sem url :: resposta
+2026-11-16 15:59:13 [cheia] sem url :: resposta
+2026-11-16 15:59:13 [magra] sem url :: falha desconhecida
+2026-11-16 15:59:13 [magra] sem url :: resposta
+2026-11-16 15:59:13 [magra] sem url :: resposta
+2026-11-16 15:59:13 [teste] sem url :: falha desconhecida
+2026-11-16 15:59:13 [magra] sem url :: falha desconhecida
+2026-11-16 16:00:21 [injecao] sem url :: falha desconhecida
+2026-11-16 16:00:21 [injecao] sem url :: x
+2026-11-16 16:00:21 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:00:21 [cheia] sem url :: execucao
+2026-11-16 16:00:21 [cheia] sem url :: resposta
+2026-11-16 16:00:21 [cheia] sem url :: resposta
+2026-11-16 16:00:21 [cheia] sem url :: resposta
+2026-11-16 16:00:21 [magra] sem url :: falha desconhecida
+2026-11-16 16:00:21 [magra] sem url :: resposta
+2026-11-16 16:00:21 [magra] sem url :: resposta
+2026-11-16 16:00:21 [teste] sem url :: falha desconhecida
+2026-11-16 16:00:21 [magra] sem url :: falha desconhecida
+2026-11-16 16:02:24 [injecao] sem url :: falha desconhecida
+2026-11-16 16:02:24 [injecao] sem url :: x
+2026-11-16 16:02:24 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:02:24 [cheia] sem url :: execucao
+2026-11-16 16:02:24 [cheia] sem url :: resposta
+2026-11-16 16:02:24 [cheia] sem url :: resposta
+2026-11-16 16:02:24 [cheia] sem url :: resposta
+2026-11-16 16:02:24 [magra] sem url :: falha desconhecida
+2026-11-16 16:02:24 [magra] sem url :: resposta
+2026-11-16 16:02:24 [magra] sem url :: resposta
+2026-11-16 16:02:24 [teste] sem url :: falha desconhecida
+2026-11-16 16:02:24 [magra] sem url :: falha desconhecida
+2026-11-16 16:02:39 [injecao] sem url :: falha desconhecida
+2026-11-16 16:02:39 [injecao] sem url :: x
+2026-11-16 16:02:39 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:02:39 [cheia] sem url :: execucao
+2026-11-16 16:02:39 [cheia] sem url :: resposta
+2026-11-16 16:02:39 [cheia] sem url :: resposta
+2026-11-16 16:02:39 [cheia] sem url :: resposta
+2026-11-16 16:02:39 [magra] sem url :: falha desconhecida
+2026-11-16 16:02:39 [magra] sem url :: resposta
+2026-11-16 16:02:39 [magra] sem url :: resposta
+2026-11-16 16:02:39 [teste] sem url :: falha desconhecida
+2026-11-16 16:02:39 [magra] sem url :: falha desconhecida
+2026-11-16 16:03:45 [injecao] sem url :: falha desconhecida
+2026-11-16 16:03:45 [injecao] sem url :: x
+2026-11-16 16:03:45 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:03:45 [cheia] sem url :: execucao
+2026-11-16 16:03:45 [cheia] sem url :: resposta
+2026-11-16 16:03:45 [cheia] sem url :: resposta
+2026-11-16 16:03:45 [cheia] sem url :: resposta
+2026-11-16 16:03:45 [magra] sem url :: falha desconhecida
+2026-11-16 16:03:45 [magra] sem url :: resposta
+2026-11-16 16:03:45 [magra] sem url :: resposta
+2026-11-16 16:03:45 [teste] sem url :: falha desconhecida
+2026-11-16 16:03:45 [magra] sem url :: falha desconhecida
+2026-11-16 16:04:37 [injecao] sem url :: falha desconhecida
+2026-11-16 16:04:37 [injecao] sem url :: x
+2026-11-16 16:04:37 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:04:37 [cheia] sem url :: execucao
+2026-11-16 16:04:37 [cheia] sem url :: resposta
+2026-11-16 16:04:37 [cheia] sem url :: resposta
+2026-11-16 16:04:37 [cheia] sem url :: resposta
+2026-11-16 16:04:37 [magra] sem url :: falha desconhecida
+2026-11-16 16:04:37 [magra] sem url :: resposta
+2026-11-16 16:04:37 [magra] sem url :: resposta
+2026-11-16 16:04:37 [teste] sem url :: falha desconhecida
+2026-11-16 16:04:37 [magra] sem url :: falha desconhecida
+2026-11-16 16:04:44 [injecao] sem url :: falha desconhecida
+2026-11-16 16:04:44 [injecao] sem url :: x
+2026-11-16 16:04:44 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:04:44 [cheia] sem url :: execucao
+2026-11-16 16:04:44 [cheia] sem url :: resposta
+2026-11-16 16:04:44 [cheia] sem url :: resposta
+2026-11-16 16:04:44 [cheia] sem url :: resposta
+2026-11-16 16:04:44 [magra] sem url :: falha desconhecida
+2026-11-16 16:04:44 [magra] sem url :: resposta
+2026-11-16 16:04:44 [magra] sem url :: resposta
+2026-11-16 16:04:44 [teste] sem url :: falha desconhecida
+2026-11-16 16:04:44 [magra] sem url :: falha desconhecida
+2026-11-16 16:05:47 [injecao] sem url :: falha desconhecida
+2026-11-16 16:05:47 [injecao] sem url :: x
+2026-11-16 16:05:47 [injecao] sem url :: {"ok":false,"err":"sem global"}
+2026-11-16 16:05:47 [cheia] sem url :: execucao
+2026-11-16 16:05:47 [cheia] sem url :: resposta
+2026-11-16 16:05:47 [cheia] sem url :: resposta
+2026-11-16 16:05:47 [cheia] sem url :: resposta
+2026-11-16 16:05:47 [magra] sem url :: falha desconhecida
+2026-11-16 16:05:47 [magra] sem url :: resposta
+2026-11-16 16:05:47 [magra] sem url :: resposta
+2026-11-16 16:05:47 [teste] sem url :: falha desconhecida
+2026-11-16 16:05:47 [magra] sem url :: falha desconhecida
