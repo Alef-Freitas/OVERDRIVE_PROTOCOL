@@ -1719,6 +1719,12 @@ func (a *app) applyBounds() {
 		return
 	}
 
+	if espCanvas.aberto >= 0 {
+		espPosicionarWebView(a)
+
+		return
+	}
+
 	acordado := !a.tudoSuspenso
 	a.aplicarVisibilidadePrincipal(acordado)
 	a.aplicarVisibilidadePopup(acordado)

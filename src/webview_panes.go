@@ -76,6 +76,7 @@ func (a *app) startEnvironment() {
 
 func (a *app) createPanes() {
 	a.restaurarAbas()
+	espOcultarWebView(a)
 
 	if a.st.LeftPanelVisible {
 		a.abrirPainelEsquerda()

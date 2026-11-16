@@ -2,3 +2,4 @@
 *.exe~
 browser/data/
 browser/config/
+browser/runtime/

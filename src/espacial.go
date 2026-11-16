@@ -36,9 +36,12 @@ type estadoEspacial struct {
 	cartoes    []cardEspacial
 	selecao    rectT
 	arrastando bool
+	movendo    bool
 	origemX    int32
 	origemY    int32
+	cardOrigem rectT
 	foco       int
+	aberto     int
 	zoom       float64
 	offsetX    int32
 	offsetY    int32
@@ -53,9 +56,12 @@ func espIniciar() {
 		cartoes:    nil,
 		selecao:    rectT{},
 		arrastando: false,
+		movendo:    false,
 		origemX:    0,
 		origemY:    0,
+		cardOrigem: rectT{},
 		foco:       -1,
+		aberto:     -1,
 		zoom:       1,
 		offsetX:    0,
 		offsetY:    0,
@@ -148,13 +154,21 @@ func espMouseDown(app *app, x, y int32) {
 	indice := espCartaoEm(x, y)
 	if indice >= 0 {
 		espCanvas.foco = indice
-		espAbrirCard(app, indice)
-		pInvalidateRect.Call(app.hwnd, 0, 1)
+		espCanvas.movendo = true
+		espCanvas.origemX = x
+		espCanvas.origemY = y
+		espCanvas.cardOrigem = espCanvas.cartoes[indice].rect
+
+		pSetCapture.Call(app.hwnd)
 
 		return
 	}
 
 	espCanvas.foco = -1
+	espCanvas.aberto = -1
+
+	espOcultarWebView(app)
+
 	espCanvas.arrastando = true
 	espCanvas.origemX = x
 	espCanvas.origemY = y
@@ -166,17 +180,51 @@ func espMouseDown(app *app, x, y int32) {
 }
 
 func espMouseMove(app *app, x, y int32) {
-	if app == nil || !espCanvas.arrastando {
+	if app == nil {
 		return
 	}
 
-	espCanvas.selecao = espNormalizar(espCanvas.origemX, espCanvas.origemY, x, y)
+	if espCanvas.movendo {
+		dx := x - espCanvas.origemX
+		dy := y - espCanvas.origemY
+		origem := espCanvas.cardOrigem
+		espCanvas.cartoes[espCanvas.foco].rect = rectT{
+			origem.Left + dx, origem.Top + dy,
+			origem.Right + dx, origem.Bottom + dy,
+		}
 
-	pInvalidateRect.Call(app.hwnd, 0, 1)
+		espPosicionarWebView(app)
+
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+
+		return
+	}
+
+	if espCanvas.arrastando {
+		espCanvas.selecao = espNormalizar(espCanvas.origemX, espCanvas.origemY, x, y)
+
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+	}
 }
 
 func espMouseUp(app *app, x, y int32) {
-	if app == nil || !espCanvas.arrastando {
+	if app == nil {
+		return
+	}
+
+	if espCanvas.movendo {
+		espCanvas.movendo = false
+
+		pReleaseCapture.Call()
+
+		if !espCanvas.arrastando && espCanvas.foco >= 0 {
+			espAbrirCard(app, espCanvas.foco)
+		}
+
+		return
+	}
+
+	if !espCanvas.arrastando {
 		return
 	}
 
@@ -204,13 +252,47 @@ func espAbrirCard(app *app, indice int) bool {
 		return false
 	}
 
-	if app.left == nil || app.left.wv == nil {
+	if app.left == nil || app.left.wv == nil || !app.left.ready {
 		return false
 	}
 
 	app.left.wv.Navigate(card.url)
 
+	espCanvas.aberto = indice
+
+	espPosicionarWebView(app)
+
 	return true
+}
+
+func espPosicionarWebView(app *app) {
+	if app == nil || app.left == nil || app.left.wv == nil || !app.left.ready {
+		return
+	}
+
+	indice := espCanvas.aberto
+	if indice < 0 || indice >= len(espCanvas.cartoes) {
+		return
+	}
+
+	area := espCanvas.cartoes[indice].rect
+
+	nova := Rect(area)
+	if app.left.boundsApplied != nova {
+		app.left.wv.SetBounds(nova)
+		app.left.boundsApplied = nova
+		app.left.boundsSet = true
+	}
+
+	setPaneVisible(app.left, true)
+}
+
+func espOcultarWebView(app *app) {
+	if app == nil || app.left == nil || app.left.wv == nil || !app.left.ready {
+		return
+	}
+
+	setPaneVisible(app.left, false)
 }
 
 func espPintar(disp *d2dMotor, app *app) {
