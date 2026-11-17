@@ -39,7 +39,7 @@ func marbleAbrirMenuContexto(app *app, x, y int32) {
 	marbleUI.menuAberto = true
 	marbleUI.menuX = x
 	marbleUI.menuY = y
-	pInvalidateRect.Call(app.hwnd, 0, 1)
+	marbleSincronizarCamadas(app)
 }
 
 func marbleExecutarItemMenu(app *app, indice int) {
@@ -47,7 +47,7 @@ func marbleExecutarItemMenu(app *app, indice int) {
 	case 0:
 		marbleNovaCard(app)
 	case 1:
-		return
+		marbleAlternarReadMode(app)
 	case 2:
 		marbleAdicionarSticky()
 	case 3:
@@ -55,11 +55,11 @@ func marbleExecutarItemMenu(app *app, indice int) {
 	case 4:
 		boardDobrar()
 	case 5:
-		return
+		marbleTrocarSpace(app, (marbleEspacoAtual+1)%marbleNumSpaces)
 	case 6:
-		return
+		marbleTrocarSpace(app, (marbleEspacoAtual+1)%marbleNumSpaces)
 	case 7:
-		return
+		marbleAlternarAjuda(app)
 	}
 	marbleUI.menuAberto = false
 	pInvalidateRect.Call(app.hwnd, 0, 1)

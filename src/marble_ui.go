@@ -182,6 +182,7 @@ func marblePintarSugestoes(disp *d2dMotor, app *app) {
 }
 
 func marblePintar(disp *d2dMotor, app *app) {
+	marbleVerificarCamadas(app)
 	marblePintarSidebar(disp, app)
 	marblePintarPaleta(disp, app)
 	marblePintarMenu(disp, app)
@@ -256,7 +257,7 @@ func marbleTecla(app *app, tecla, bruta uint32) bool {
 		marbleUI.paletaAberta = !marbleUI.paletaAberta
 		marbleUI.busca = ""
 		marbleUI.linhaFoco = 0
-		pInvalidateRect.Call(app.hwnd, 0, 1)
+		marbleSincronizarCamadas(app)
 
 		return true
 	}
