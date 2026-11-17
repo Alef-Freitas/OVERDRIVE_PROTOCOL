@@ -1943,7 +1943,7 @@ func (a *app) createWindow() error {
 
 func (a *app) criarCampoEndereco(hwnd, hInst uintptr) {
 	a.urlEdit, _, _ = pCreateWindowExW.Call(
-		0,
+		wsExLayered, // permite esconder o fundo quando editando nota.
 		uintptr(unsafe.Pointer(utf16("EDIT"))),
 		uintptr(unsafe.Pointer(utf16(""))),
 		wsChild|wsVisible|wsTabStop|esAutoHScroll|esLeft,

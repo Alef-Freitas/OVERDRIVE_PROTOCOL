@@ -232,6 +232,7 @@ func espMostrarEdit(app *app, indice int) {
 	app.invalidaEditCache()
 	pShowWindow.Call(app.urlEdit, swShow)
 	pSetFocus.Call(app.urlEdit)
+	pSetLayeredWindowAttributes.Call(app.urlEdit, 0, alfaOpacoD2D, lwaAlpha)
 
 	espEditAtivo = true
 }

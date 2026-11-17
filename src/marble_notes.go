@@ -29,8 +29,9 @@ func marbleCriarNota(app *app) {
 	area := app.clientRect()
 	largura := app.sc(260)
 	altura := app.sc(200)
-	esq := area.Left + (area.Width()-largura)/meioD2D
-	topo := area.Top + (area.Height()-altura)/meioD2D
+	offset := int32(len(espCanvas.cartoes)%6) * app.sc(28)
+	esq := area.Left + app.sc(120) + offset
+	topo := area.Top + app.sc(120) + offset
 
 	cor := marbleCoresNota[marbleProximaCor%len(marbleCoresNota)]
 	marbleProximaCor++
@@ -65,6 +66,10 @@ func marbleEditarNota(app *app, indice int) {
 	app.invalidaEditCache()
 	pShowWindow.Call(app.urlEdit, swShow)
 	pSetFocus.Call(app.urlEdit)
+
+	// Campo invisivel: o texto da nota e desenhado pelo D2D, o edit so
+	// captura o teclado. Fundo transparente (alpha 0) evita a caixa preta.
+	pSetLayeredWindowAttributes.Call(app.urlEdit, 0, 0, lwaAlpha)
 
 	espCanvas.editando = indice
 	espEditAtivo = true
