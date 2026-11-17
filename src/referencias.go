@@ -5,7 +5,6 @@ package main
 var (
 	_ = editProcPtr
 	_ = (*app).cuidarDuploCliqueJanela
-	_ = (*app).criarCampoEndereco
 	_ = downloadAtivoParaBarra
 	_ = downloadPorcentagemBarra
 	_ = downloadSomarProgresso

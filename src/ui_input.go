@@ -64,7 +64,7 @@ func editProc(hwnd uintptr, msg uint32, wparam, lparam uintptr) uintptr {
 
 	switch msg {
 	case wmKeyDown:
-		if app.teclaEditProc(hwnd, wparam) {
+		if app.tratarTeclaEdit(hwnd, wparam) {
 			return 0
 		}
 	case wmChar:
@@ -84,6 +84,14 @@ func editProc(hwnd uintptr, msg uint32, wparam, lparam uintptr) uintptr {
 	r, _, _ := pCallWindowProcW.Call(app.oldEditProc, hwnd, uintptr(msg), wparam, lparam)
 
 	return r
+}
+
+func (a *app) tratarTeclaEdit(hwnd, wparam uintptr) bool {
+	if espEditAtivo && espTeclaEditCard(a, wparam) {
+		return true
+	}
+
+	return a.teclaEditProc(hwnd, wparam)
 }
 
 // teclaEditProc trata as teclas no campo de endereco; true = consumiu.

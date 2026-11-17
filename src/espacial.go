@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 	"time"
+	"unsafe"
 )
 
 const (
@@ -29,6 +30,13 @@ const (
 	espMascaraPalavra = 0xFFFF
 	espPrimeiroCar    = 32
 	espRaioURL        = 6
+	espAlphaInicial   = 205
+	espAlphaMin       = 40
+	espAlphaMax       = 255
+	espSliderLargura  = 160
+	espSliderAltura   = 8
+	espSliderMargem   = 16
+	espSliderTopo     = 40
 )
 
 type cardEspacial struct {
@@ -39,25 +47,29 @@ type cardEspacial struct {
 }
 
 type estadoEspacial struct {
-	cartoes     []cardEspacial
-	selecao     rectT
-	arrastando  bool
-	movendo     bool
-	origemX     int32
-	origemY     int32
-	cardOrigem  rectT
-	foco        int
-	aberto      int
-	editando    int
-	textoEdicao string
-	zoom        float64
-	offsetX     int32
-	offsetY     int32
-	criacao     time.Time
+	cartoes          []cardEspacial
+	selecao          rectT
+	arrastando       bool
+	movendo          bool
+	origemX          int32
+	origemY          int32
+	cardOrigem       rectT
+	foco             int
+	aberto           int
+	editando         int
+	zoom             float64
+	offsetX          int32
+	offsetY          int32
+	criacao          time.Time
+	alpha            uint32
+	arrastandoSlider bool
 }
 
 //nolint:gochecknoglobals // Estado unico do canvas espacial: UI single-window.
 var espCanvas estadoEspacial
+
+//nolint:gochecknoglobals // Flag de edicao de URL via campo nativo do OVERDRIVE.
+var espEditAtivo bool
 
 func espFecharPaineisInicio(app *app) {
 	if app == nil {
@@ -72,21 +84,22 @@ func espFecharPaineisInicio(app *app) {
 
 func espIniciar() {
 	espCanvas = estadoEspacial{
-		cartoes:     nil,
-		selecao:     rectT{},
-		arrastando:  false,
-		movendo:     false,
-		origemX:     0,
-		origemY:     0,
-		cardOrigem:  rectT{},
-		foco:        -1,
-		aberto:      -1,
-		editando:    -1,
-		textoEdicao: "",
-		zoom:        1,
-		offsetX:     0,
-		offsetY:     0,
-		criacao:     time.Time{},
+		cartoes:          nil,
+		selecao:          rectT{},
+		arrastando:       false,
+		movendo:          false,
+		origemX:          0,
+		origemY:          0,
+		cardOrigem:       rectT{},
+		foco:             -1,
+		aberto:           -1,
+		editando:         -1,
+		zoom:             1,
+		offsetX:          0,
+		offsetY:          0,
+		criacao:          time.Time{},
+		alpha:            espAlphaInicial,
+		arrastandoSlider: false,
 	}
 }
 
@@ -136,7 +149,6 @@ func espAdicionar(retangulo rectT) {
 
 	espCanvas.foco = len(espCanvas.cartoes) - 1
 	espCanvas.editando = espCanvas.foco
-	espCanvas.textoEdicao = ""
 }
 
 func espAreaURL(indice int) rectT {
@@ -152,32 +164,67 @@ func espAreaURL(indice int) rectT {
 	}
 }
 
-func espFinalizarEdicao() {
-	indice := espCanvas.editando
-	if indice < 0 || indice >= len(espCanvas.cartoes) {
-		espCanvas.editando = -1
-
+func espOcultarEdit(app *app) {
+	if app == nil || app.urlEdit == 0 {
 		return
 	}
 
-	url := strings.TrimSpace(espCanvas.textoEdicao)
+	pShowWindow.Call(app.urlEdit, swHide)
+
+	espEditAtivo = false
+}
+
+func espMostrarEdit(app *app, indice int) {
+	if app == nil || app.urlEdit == 0 || indice < 0 || indice >= len(espCanvas.cartoes) {
+		return
+	}
+
+	area := espAreaURL(indice)
+	if area.Width() <= 0 {
+		return
+	}
+
+	pSetWindowPos.Call(app.urlEdit, 0,
+		uintptr(area.Left), uintptr(area.Top),
+		uintptr(area.Width()), uintptr(area.Height()),
+		swpNoZOrder|swpNoActivate|swpShowWindow)
+
+	pSetWindowTextW.Call(app.urlEdit, uintptr(unsafe.Pointer(utf16(espCanvas.cartoes[indice].url))))
+	app.invalidaEditCache()
+	pShowWindow.Call(app.urlEdit, swShow)
+	pSetFocus.Call(app.urlEdit)
+
+	espEditAtivo = true
+}
+
+func espFinalizarEdicao(app *app) {
+	indice := espCanvas.editando
+	if app != nil && indice >= 0 && indice < len(espCanvas.cartoes) {
+		url := strings.TrimSpace(app.editText())
+		espCanvas.cartoes[indice].url = url
+		espCanvas.cartoes[indice].titulo = url
+	}
+
+	espOcultarEdit(app)
+
+	espCanvas.editando = -1
+}
+
+func espEditAplicar(app *app, texto string) {
+	indice := espCanvas.editando
+	if app == nil || indice < 0 || indice >= len(espCanvas.cartoes) {
+		return
+	}
+
+	url := strings.TrimSpace(texto)
 	espCanvas.cartoes[indice].url = url
 	espCanvas.cartoes[indice].titulo = url
+
+	espOcultarEdit(app)
+
 	espCanvas.editando = -1
-	espCanvas.textoEdicao = ""
-}
 
-func espInserirCaractere(car rune) {
-	espCanvas.textoEdicao += string(car)
-}
-
-func espApagarCaractere() {
-	texto := []rune(espCanvas.textoEdicao)
-	if len(texto) == 0 {
-		return
-	}
-
-	espCanvas.textoEdicao = string(texto[:len(texto)-1])
+	pInvalidateRect.Call(app.hwnd, 0, 1)
 }
 
 func espRemoverFoco() {
@@ -224,8 +271,83 @@ func espPintarBotaoSair(disp *d2dMotor, app *app) {
 	disp.textoUI("SAIR", botao, espCorTitulo, true, true)
 }
 
+func espSliderRect(app *app) rectT {
+	if app == nil {
+		return rectT{}
+	}
+
+	area := app.clientRect()
+	esq := area.Left + espSliderMargem
+	topo := area.Top + espSliderTopo
+
+	return rectT{
+		esq, topo,
+		esq + app.sc(espSliderLargura), topo + app.sc(espSliderAltura),
+	}
+}
+
+func espAplicarAlpha(app *app) {
+	if app == nil || app.hwnd == 0 {
+		return
+	}
+
+	pSetLayeredWindowAttributes.Call(app.hwnd, 0, uintptr(espCanvas.alpha), lwaAlpha)
+}
+
+func espAjustarAlphaSlider(app *app, x int32) {
+	area := espSliderRect(app)
+	if area.Width() <= 0 {
+		return
+	}
+
+	fracao := float64(x-area.Left) / float64(area.Width())
+	if fracao < 0 {
+		fracao = 0
+	}
+
+	if fracao > 1 {
+		fracao = 1
+	}
+
+	espCanvas.alpha = espAlphaMin + uint32(float64(espAlphaMax-espAlphaMin)*fracao)
+
+	espAplicarAlpha(app)
+
+	pInvalidateRect.Call(app.hwnd, 0, 1)
+}
+
+func espPintarSlider(disp *d2dMotor, app *app) {
+	area := espSliderRect(app)
+	if area.Width() <= 0 {
+		return
+	}
+
+	disp.ret(area, espBordaCard)
+
+	fracao := float64(espCanvas.alpha-espAlphaMin) / float64(espAlphaMax-espAlphaMin)
+	if fracao < 0 {
+		fracao = 0
+	}
+
+	if fracao > 1 {
+		fracao = 1
+	}
+
+	posicao := area.Left + int32(float64(area.Width())*fracao)
+	marcador := rectT{posicao - 3, area.Top - 4, posicao + 3, area.Bottom + 4}
+	disp.ret(marcador, espBordaFoco)
+}
+
 func espMouseDown(app *app, x, y int32) {
 	if app == nil {
+		return
+	}
+
+	if espDentro(espSliderRect(app), x, y) {
+		espCanvas.arrastandoSlider = true
+
+		espAjustarAlphaSlider(app, x)
+
 		return
 	}
 
@@ -236,7 +358,7 @@ func espMouseDown(app *app, x, y int32) {
 	}
 
 	if espCanvas.editando >= 0 {
-		espFinalizarEdicao()
+		espFinalizarEdicao(app)
 		pInvalidateRect.Call(app.hwnd, 0, 1)
 	}
 
@@ -246,9 +368,7 @@ func espMouseDown(app *app, x, y int32) {
 
 		if espDentro(espAreaURL(indice), x, y) {
 			espCanvas.editando = indice
-			espCanvas.textoEdicao = espCanvas.cartoes[indice].url
-
-			pInvalidateRect.Call(app.hwnd, 0, 1)
+			espMostrarEdit(app, indice)
 
 			return
 		}
@@ -283,6 +403,12 @@ func espMouseMove(app *app, x, y int32) {
 		return
 	}
 
+	if espCanvas.arrastandoSlider {
+		espAjustarAlphaSlider(app, x)
+
+		return
+	}
+
 	if espCanvas.movendo {
 		dx := x - espCanvas.origemX
 		dy := y - espCanvas.origemY
@@ -311,6 +437,14 @@ func espMouseUp(app *app, x, y int32) {
 		return
 	}
 
+	if espCanvas.arrastandoSlider {
+		espCanvas.arrastandoSlider = false
+
+		pReleaseCapture.Call()
+
+		return
+	}
+
 	if espCanvas.movendo {
 		espCanvas.movendo = false
 
@@ -330,6 +464,7 @@ func espMouseUp(app *app, x, y int32) {
 	retangulo := espNormalizar(espCanvas.origemX, espCanvas.origemY, x, y)
 	if espRectValido(retangulo) {
 		espAdicionar(retangulo)
+		espMostrarEdit(app, espCanvas.editando)
 	}
 
 	espCanvas.selecao = rectT{}
@@ -352,62 +487,30 @@ func espDuploClique(app *app, x, y int32) {
 	pInvalidateRect.Call(app.hwnd, 0, 1)
 }
 
-func espTeclaChar(app *app, wparam uintptr) bool {
-	if espCanvas.editando < 0 {
-		return false
-	}
-
-	car := rune(wparam & espMascaraPalavra)
-	if car >= espPrimeiroCar {
-		espInserirCaractere(car)
-	}
-
-	pInvalidateRect.Call(app.hwnd, 0, 1)
-
-	return true
-}
-
-func espTeclaEdicao(tecla uint32) bool {
-	switch tecla {
+func espTeclaEditCard(app *app, wparam uintptr) bool {
+	switch uint32(wparam) {
 	case vkReturn:
-		espFinalizarEdicao()
-	case vkBackspace:
-		espApagarCaractere()
+		espEditAplicar(app, app.editText())
+
+		return true
 	case vkEscape:
+		espOcultarEdit(app)
+
 		espCanvas.editando = -1
-		espCanvas.textoEdicao = ""
-	default:
-		return false
-	}
-
-	return true
-}
-
-func espTecla(app *app, mensagem uint32, wparam uintptr) bool {
-	if app == nil {
-		return false
-	}
-
-	if mensagem == wmChar {
-		return espTeclaChar(app, wparam)
-	}
-
-	if mensagem != wmKeyDown {
-		return false
-	}
-
-	tecla := uint32(wparam & espMascaraPalavra)
-	if espCanvas.editando >= 0 {
-		if !espTeclaEdicao(tecla) {
-			return false
-		}
-
-		pInvalidateRect.Call(app.hwnd, 0, 1)
 
 		return true
 	}
 
-	if tecla == vkDelete {
+	return false
+}
+
+func espTecla(app *app, mensagem uint32, wparam uintptr) bool {
+	if app == nil || mensagem != wmKeyDown {
+		return false
+	}
+
+	tecla := uint32(wparam & espMascaraPalavra)
+	if tecla == vkDelete && espCanvas.editando < 0 {
 		espRemoverFoco()
 		pInvalidateRect.Call(app.hwnd, 0, 1)
 
@@ -484,11 +587,11 @@ func espPintarBarraURL(disp *d2dMotor, indice int) {
 
 	disp.redondo(areaURL, espRaioURL, espFundoCard, corURL)
 
-	textoURL := espCanvas.cartoes[indice].url
 	if indice == espCanvas.editando {
-		textoURL = espCanvas.textoEdicao
+		return
 	}
 
+	textoURL := espCanvas.cartoes[indice].url
 	if textoURL == "" {
 		textoURL = espURLPlaceholder
 	}
@@ -518,4 +621,6 @@ func espPintar(disp *d2dMotor, app *app) {
 	if espCanvas.selecao.Width() > 0 && espCanvas.selecao.Height() > 0 {
 		disp.contorno(espCanvas.selecao, espCorSelecao)
 	}
+
+	espPintarSlider(disp, app)
 }

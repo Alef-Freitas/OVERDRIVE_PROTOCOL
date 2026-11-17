@@ -1875,12 +1875,12 @@ func aplicarEstiloJanela(hwnd uintptr) {
 	pSetWindowTheme.Call(hwnd, uintptr(unsafe.Pointer(utf16("DarkMode_Explorer"))), 0)
 }
 
-func (a *app) finalizarCriacaoJanela(hwnd, _ uintptr, hIcon uintptr) {
+func (a *app) finalizarCriacaoJanela(hwnd, hInst, hIcon uintptr) {
 	a.dpi = dpiForWindow(hwnd)
 	a.initBrushes()
 	a.initFonts()
 	a.tbHeight = a.sc(28)
-	// a.criarCampoEndereco(hwnd, hInst)
+	a.criarCampoEndereco(hwnd, hInst)
 	pShowWindow.Call(hwnd, swShow)
 	pUpdateWindow.Call(hwnd)
 	pSetFocus.Call(hwnd)
@@ -1925,7 +1925,8 @@ func (a *app) createWindow() error {
 	}
 
 	a.hwnd = hwnd
-	pSetLayeredWindowAttributes.Call(hwnd, 0, alfaJanela, lwaAlpha)
+	// pSetLayeredWindowAttributes.Call(hwnd, 0, alfaJanela, lwaAlpha)
+	espAplicarAlpha(a)
 	pSetWindowLongPtrW.Call(hwnd, gwlpUserData, uintptr(unsafe.Pointer(a)))
 	clipboardIniciar(hwnd)
 	a.initTooltip()
