@@ -14,11 +14,12 @@ const (
 	espCardAlturaMin  = 30
 	espCardRaio       = 10
 	espBorda          = 2
-	espFundoCard      = 0xD0182028
-	espBordaCard      = 0xFF3A4A5A
-	espBordaFoco      = 0xFF00D0E0
-	espCorSelecao     = 0x8000D0E0
-	espCorTitulo      = 0xFFE8F0F4
+	espFundoCard      = 0xE0252521
+	espBordaCard      = 0xFF35302E
+	espBordaFoco      = 0xFFB6C42E
+	espCorSelecao     = 0x80B6C42E
+	espCorTitulo      = 0xFFF0EEED
+	espCorDim         = 0xFFBAB4B0
 	espTituloAlt      = 24
 	espMargem         = 8
 	espZoomMin        = 0.25
@@ -600,7 +601,7 @@ func espPintarBarraURL(disp *d2dMotor, indice int) {
 		areaURL.Left + espMargem, areaURL.Top,
 		areaURL.Right - espMargem, areaURL.Bottom,
 	}
-	disp.textoUI(textoURL, areaTexto, espCorTitulo, true, false)
+	disp.textoUI(textoURL, areaTexto, espCorDim, true, false)
 }
 
 func espPintar(disp *d2dMotor, app *app) {
