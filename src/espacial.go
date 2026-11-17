@@ -666,18 +666,24 @@ func espAtalhosCtrl(app *app, tecla uint32, shift bool) bool {
 func espAtalhosSimples(app *app, tecla uint32) bool {
 	switch tecla {
 	case teclaTeclaT:
+		marbleMostrarOverlay("TIDY UP", "T")
+
 		return boardTidy()
 	case vkTab:
 		return boardNavegar(app, false)
 	case teclaTeclaS:
+		marbleMostrarOverlay("FOLD TRAIL", "S")
+
 		return boardDobrar()
 	case teclaTeclaF:
 		return boardAjustarView(app)
 	case teclaTeclaN:
+		marbleMostrarOverlay("NOTE", "N")
 		marbleCriarNota(app)
 
 		return true
 	case teclaTeclaW:
+		marbleMostrarOverlay("NEW WINDOW", "W")
 		marbleNovaCard(app)
 
 		return true

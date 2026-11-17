@@ -31,6 +31,7 @@ func marbleDemoAdicionarCard(titulo, endereco string, rect rectT) {
 // marbleModoDemo reproduz o board completo do vídeo: nota inicial, trilha de
 // cards do Japão, notas coloridas e stickies, com o texto exato dos frames.
 func marbleModoDemo(app *app) {
+	marbleFecharWebPanes()
 	espCanvas.cartoes = nil
 	espCanvas.foco = -1
 	espCanvas.aberto = -1
@@ -58,17 +59,30 @@ func marbleModoDemo(app *app) {
 		marbleCoresNota[2],
 	)
 
-	// Trilha de cards do Japão (frames 8-18) — 4 cards lado a lado.
+	// Trilha de cards do Japão (frames 8-18) — 4 cards lado a lado,
+	// com páginas reais dentro (como no vídeo).
 	titulos := [...]string{
 		"Kyoto - Google Maps",
 		"Ginkakuji (Silver Pavilion)",
 		"Kiyomizudera Temple",
 		"Fushimi Inari Shrine",
 	}
+	enderecos := [...]string{
+		"https://www.japan-guide.com/e/e3909.html",
+		"https://www.japan-guide.com/e/e3908.html",
+		"https://www.japan-guide.com/e/e3907.html",
+		"https://www.japan-guide.com/e/e3906.html",
+	}
 	baseX := int32(300)
+	indicePane := 0
 	for indice, titulo := range titulos {
 		x := baseX + int32(indice)*230
-		marbleDemoAdicionarCard(titulo, "", rectT{x, 370, x + 215, 520})
+		area := rectT{x, 370, x + 215, 520}
+		marbleDemoAdicionarCard(titulo, enderecos[indice], area)
+
+		// WebView dentro do card (nasce sob demanda, como o Marble).
+		marbleCriarWebPane(app, indicePane, enderecos[indice], area)
+		indicePane++
 	}
 
 	boardSincronizar()
@@ -81,6 +95,7 @@ func marbleModoDemo(app *app) {
 		boardConectar(&boardAtivo, idPai, idFilho, boardEdgeLink)
 	}
 
-	marbleUI.sidebarAberta = false
+	marbleUI.sidebarAberta = true
+	marbleUI.linhaFoco = 0
 	pInvalidateRect.Call(app.hwnd, 0, 1)
 }

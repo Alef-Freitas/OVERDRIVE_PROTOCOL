@@ -41,7 +41,7 @@ var marbleUI marbleUIEstado
 
 func marbleIniciar() {
 	marbleUI = marbleUIEstado{
-		sidebarAberta: false,
+		sidebarAberta: true,
 		paletaAberta:  false,
 		menuAberto:    false,
 		busca:         "",
@@ -186,6 +186,7 @@ func marblePintar(disp *d2dMotor, app *app) {
 	marblePintarPaleta(disp, app)
 	marblePintarMenu(disp, app)
 	marblePintarSugestoes(disp, app)
+	marblePintarOverlay(disp, app)
 }
 
 // marbleComandosFiltrados devolve so os comandos que casam com a busca.

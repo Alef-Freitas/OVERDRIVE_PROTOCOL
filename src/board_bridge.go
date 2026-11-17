@@ -166,7 +166,13 @@ func boardTidy() bool {
 	depois := boardLerRects(ids)
 	executar, reverter := boardComandoTidy(ids, antes, depois)
 	boardHist.registrar(executar, reverter, false)
-	boardAplicarAosCartoes()
+
+	// Anima do rect anterior (antes) ate o novo (depois).
+	for indice, retanguloAntes := range antes {
+		if indice < len(depois) && indice < len(espCanvas.cartoes) {
+			marbleAnimarPara(indice, boardParaRect(retanguloAntes), boardParaRect(depois[indice]))
+		}
+	}
 
 	return true
 }

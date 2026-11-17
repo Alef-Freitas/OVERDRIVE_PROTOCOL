@@ -417,6 +417,16 @@ func (a *app) cuidarPintura(hwnd uintptr) {
 	} else {
 		pValidateRect.Call(hwnd, 0)
 	}
+
+	// Continua as animacoes em curso (Tidy/spawn) agendando o proximo frame.
+	if marbleAtualizarAnimacoes() {
+		pInvalidateRect.Call(hwnd, 0, 0)
+	}
+
+	// Mantem o overlay de atalho atualizado ate expirar.
+	if marbleOverlayTexto != "" {
+		pInvalidateRect.Call(hwnd, 0, 0)
+	}
 }
 
 func (a *app) cuidarTimerStatus(hwnd uintptr) {
