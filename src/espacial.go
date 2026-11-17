@@ -61,6 +61,7 @@ const (
 	teclaTeclaN = 0x4E
 	teclaTeclaW = 0x57
 	vkF9        = 0x78
+	vkF1        = 0x70
 )
 
 type cardEspacial struct {
@@ -602,6 +603,13 @@ func espTecla(app *app, mensagem uint32, wparam uintptr) bool {
 	}
 
 	tecla := uint32(wparam & espMascaraPalavra)
+	if tecla == vkEscape && marbleAjudaAberta {
+		marbleAjudaAberta = false
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+
+		return true
+	}
+
 	if tecla == vkDelete && espCanvas.editando < 0 {
 		espRemoverFoco()
 		pInvalidateRect.Call(app.hwnd, 0, 1)
@@ -689,6 +697,10 @@ func espAtalhosSimples(app *app, tecla uint32) bool {
 		return true
 	case vkF9:
 		marbleModoDemo(app)
+
+		return true
+	case vkF1:
+		marbleAlternarAjuda(app)
 
 		return true
 	case vkReturn:

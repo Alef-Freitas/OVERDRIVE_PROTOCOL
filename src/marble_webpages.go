@@ -55,4 +55,3 @@ func marblePosicionarWebPane(app *app, indice int, area rectT) {
 	}
 	setPaneVisible(p, true)
 }
-

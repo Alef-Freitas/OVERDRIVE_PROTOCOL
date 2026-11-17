@@ -187,6 +187,7 @@ func marblePintar(disp *d2dMotor, app *app) {
 	marblePintarMenu(disp, app)
 	marblePintarSugestoes(disp, app)
 	marblePintarOverlay(disp, app)
+	marblePintarAjuda(disp, app)
 }
 
 // marbleComandosFiltrados devolve so os comandos que casam com a busca.
