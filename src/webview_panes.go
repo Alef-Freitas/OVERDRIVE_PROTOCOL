@@ -68,6 +68,11 @@ func (a *app) startEnvironment() {
 		alinharVersaoChrome(env.BrowserVersion)
 		a.status = fmt.Sprintf(txtFmtVersaoWV, env.BrowserVersion)
 		a.createPanes()
+
+		// Modo Marble: esconde o pane assim que fica pronto (o card so abre
+		// o WebView mediante duplo clique).
+		espOcultarWebView(a)
+		pInvalidateRect.Call(a.hwnd, 0, 1)
 	})
 	if err != nil {
 		a.status = err.Error()
@@ -75,16 +80,10 @@ func (a *app) startEnvironment() {
 }
 
 func (a *app) createPanes() {
-	a.restaurarAbas()
+	// Modo Marble Overdrive: nao restaurar abas no arranque. O WebView so
+	// nasce quando o usuario abre um card (via espAbrirCard).
+	// a.restaurarAbas()  // preservado: reativar se voltar ao OVERDRIVE classico.
 	espOcultarWebView(a)
-
-	if a.st.LeftPanelVisible {
-		a.abrirPainelEsquerda()
-	}
-
-	if a.st.RightVisible {
-		a.abrirPainelChat()
-	}
 }
 
 func (a *app) prepararPane(p *pane, w *WebView, configurarMobile bool) {

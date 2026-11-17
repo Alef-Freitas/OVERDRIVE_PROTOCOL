@@ -698,7 +698,7 @@ const (
 
 //nolint:gochecknoglobals // Identidade do app: constantes de processo.
 var (
-	appTitle = "Overdrive"
+	appTitle = "Marble Overdrive"
 	urlChat  = "https://chat.deepseek.com/"
 )
 

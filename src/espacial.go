@@ -20,6 +20,7 @@ const (
 	espCorSelecao     = 0x80B6C42E
 	espCorTitulo      = 0xFFF0EEED
 	espCorDim         = 0xFFBAB4B0
+	espCorFaint       = 0xFF847B77
 	espTituloAlt      = 24
 	espMargem         = 8
 	espZoomMin        = 0.25
@@ -38,13 +39,40 @@ const (
 	espSliderAltura   = 8
 	espSliderMargem   = 16
 	espSliderTopo     = 40
+
+	// html.float do Marble: brilho radial suave no centro + halo de texto.
+	// O fundo continua transparente; so o "ground" escuro e composto no meio.
+	espCorGround   = 0x001E1B1A // --ground dark (#1a1b1e), AABBGGRR.
+	espGlowCamadas = 6          // numero de elipses concentricas do gradiente.
+	espGlowAlfa    = 0x29       // alpha por camada (acentua no centro).
+	espHaloAlfa    = 0x28       // alpha do halo de legibilidade do texto.
+	espHaloRaio1   = 2          // text-shadow: 0 0 2px.
+	espHaloRaio2   = 6          // text-shadow: 0 0 6px.
+	espHaloRaio3   = 12         // text-shadow: 0 0 12px.
+
+	teclaTeclaT = 0x54
+	teclaTeclaS = 0x53
+	teclaTeclaF = 0x46
+	teclaTeclaZ = 0x5A
+	teclaTeclaY = 0x59
+	teclaTeclaO = 0x4F
+	teclaTeclaK = 0x4B
+	teclaTeclaB = 0x42
+	teclaTeclaN = 0x4E
+	teclaTeclaW = 0x57
+	vkF9        = 0x78
 )
 
 type cardEspacial struct {
-	rect   rectT
-	titulo string
-	url    string
-	cr     uint32
+	id        boardID
+	rect      rectT
+	titulo    string
+	url       string
+	cr        uint32
+	ehNota    bool
+	corNota   uint32
+	textoNota string
+	temSticky bool
 }
 
 type estadoEspacial struct {
@@ -64,6 +92,7 @@ type estadoEspacial struct {
 	criacao          time.Time
 	alpha            uint32
 	arrastandoSlider bool
+	sliderVisivel    bool
 }
 
 //nolint:gochecknoglobals // Estado unico do canvas espacial: UI single-window.
@@ -101,7 +130,11 @@ func espIniciar() {
 		criacao:          time.Time{},
 		alpha:            espAlphaInicial,
 		arrastandoSlider: false,
+		sliderVisivel:    false,
 	}
+
+	boardIniciar()
+	marbleIniciar()
 }
 
 func espRectValido(r rectT) bool {
@@ -142,6 +175,7 @@ func espAdicionar(retangulo rectT) {
 	}
 
 	espCanvas.cartoes = append(espCanvas.cartoes, cardEspacial{
+		id:     0,
 		rect:   retangulo,
 		titulo: "",
 		url:    "",
@@ -203,7 +237,7 @@ func espFinalizarEdicao(app *app) {
 	if app != nil && indice >= 0 && indice < len(espCanvas.cartoes) {
 		url := strings.TrimSpace(app.editText())
 		espCanvas.cartoes[indice].url = url
-		espCanvas.cartoes[indice].titulo = url
+		espCanvas.cartoes[indice].titulo = marbleNomeSite(url)
 	}
 
 	espOcultarEdit(app)
@@ -219,7 +253,7 @@ func espEditAplicar(app *app, texto string) {
 
 	url := strings.TrimSpace(texto)
 	espCanvas.cartoes[indice].url = url
-	espCanvas.cartoes[indice].titulo = url
+	espCanvas.cartoes[indice].titulo = marbleNomeSite(url)
 
 	espOcultarEdit(app)
 
@@ -234,6 +268,10 @@ func espRemoverFoco() {
 		return
 	}
 
+	idRemovido := espCanvas.cartoes[indice].id
+	boardSincronizar()
+	boardRemoverNo(&boardAtivo, idRemovido)
+
 	espCanvas.cartoes = slices.Delete(espCanvas.cartoes, indice, indice+1)
 	if espCanvas.aberto == indice {
 		espCanvas.aberto = -1
@@ -246,30 +284,48 @@ func espRemoverFoco() {
 	espCanvas.foco = -1
 }
 
-func espBotaoSair(app *app) rectT {
-	if app == nil {
-		return rectT{}
-	}
-
-	area := app.clientRect()
-	margem := app.sc(16)
-	largura := app.sc(72)
-	altura := app.sc(30)
-
-	return rectT{
-		area.Right - margem - largura, margem,
-		area.Right - margem, margem + altura,
-	}
-}
-
-func espPintarBotaoSair(disp *d2dMotor, app *app) {
-	botao := espBotaoSair(app)
-	if botao.Width() <= 0 {
+// espTextoHaloUI desenha texto com o text-shadow de 3 camadas do html.float.
+func espTextoHaloUI(disp *d2dMotor, texto string, area rectT, cor uint32, pequeno, centro bool) {
+	if theApp == nil {
 		return
 	}
 
-	disp.redondo(botao, espCardRaio, espFundoCard, espBordaCard)
-	disp.textoUI("SAIR", botao, espCorTitulo, true, true)
+	tamPx := theApp.sc(tamFonteD2D)
+	if pequeno {
+		tamPx = theApp.sc(tamFontePeqD2D)
+	}
+
+	alinhH := int32(0)
+	if centro {
+		alinhH = 1
+	}
+
+	disp.textoComHalo(texto, area, cor, espCorGround, "Segoe UI", tamPx, alinhH, 1, 1)
+}
+
+// espPintarBrilho reproduz o radial-gradient do html.float do Marble: um brilho
+// suave da cor --ground no centro da janela. O fundo continua transparente.
+func espPintarBrilho(disp *d2dMotor, app *app) {
+	area := app.clientRect()
+	if area.Width() <= 0 || area.Height() <= 0 {
+		return
+	}
+
+	centroX := float32(area.Left+area.Right) / meioD2D
+	centroY := float32(area.Top+area.Bottom) / meioD2D
+	raioX := float32(area.Width()) / meioD2D
+	raioY := float32(area.Height()) / meioD2D
+
+	// Da maior para a menor: o centro acumula camadas (mais opaco) e as bordas
+	// ficam transparentes, equivalente ao closest-side 50% -> 100% do CSS.
+	for camada := espGlowCamadas; camada >= 1; camada-- {
+		fracao := float32(camada) / float32(espGlowCamadas)
+		meiaLargura, meiaAltura := raioX*fracao, raioY*fracao
+		disp.elipseAlfa(rectT{
+			int32(centroX - meiaLargura), int32(centroY - meiaAltura),
+			int32(centroX + meiaLargura), int32(centroY + meiaAltura),
+		}, espCorGround, espGlowAlfa)
+	}
 }
 
 func espSliderRect(app *app) rectT {
@@ -292,7 +348,14 @@ func espAplicarAlpha(app *app) {
 		return
 	}
 
-	pSetLayeredWindowAttributes.Call(app.hwnd, 0, uintptr(espCanvas.alpha), lwaAlpha)
+	// Com wallpaper o board e opaco: sem composicao com o desktop (menos CPU).
+	// Sem wallpaper, o alpha do slider controla a transparencia.
+	alfa := espCanvas.alpha
+	if marbleFundoFoto {
+		alfa = espAlphaMax
+	}
+
+	pSetLayeredWindowAttributes.Call(app.hwnd, 0, uintptr(alfa), lwaAlpha)
 }
 
 func espAjustarAlphaSlider(app *app, x int32) {
@@ -344,16 +407,14 @@ func espMouseDown(app *app, x, y int32) {
 		return
 	}
 
-	if espDentro(espSliderRect(app), x, y) {
-		espCanvas.arrastandoSlider = true
-
-		espAjustarAlphaSlider(app, x)
-
+	if marbleClique(app, x, y) {
 		return
 	}
 
-	if espDentro(espBotaoSair(app), x, y) {
-		pPostQuitMessage.Call(0)
+	if espCanvas.sliderVisivel && espDentro(espSliderRect(app), x, y) {
+		espCanvas.arrastandoSlider = true
+
+		espAjustarAlphaSlider(app, x)
 
 		return
 	}
@@ -448,6 +509,7 @@ func espMouseUp(app *app, x, y int32) {
 
 	if espCanvas.movendo {
 		espCanvas.movendo = false
+		boardRegistrarMovimentoFoco()
 
 		pReleaseCapture.Call()
 
@@ -464,7 +526,12 @@ func espMouseUp(app *app, x, y int32) {
 
 	retangulo := espNormalizar(espCanvas.origemX, espCanvas.origemY, x, y)
 	if espRectValido(retangulo) {
+		focoAnterior := espCanvas.foco
 		espAdicionar(retangulo)
+		boardSincronizar()
+		if focoAnterior >= 0 && focoAnterior < len(espCanvas.cartoes) {
+			boardConectarFoco(espCanvas.cartoes[focoAnterior].id, espCanvas.cartoes[espCanvas.foco].id)
+		}
 		espMostrarEdit(app, espCanvas.editando)
 	}
 
@@ -489,9 +556,16 @@ func espDuploClique(app *app, x, y int32) {
 }
 
 func espTeclaEditCard(app *app, wparam uintptr) bool {
+	editando := espCanvas.editando
+	ehNota := editando >= 0 && editando < len(espCanvas.cartoes) && espCanvas.cartoes[editando].ehNota
+
 	switch uint32(wparam) {
 	case vkReturn:
-		espEditAplicar(app, app.editText())
+		if ehNota {
+			marbleAplicarTextoNota(app, app.editText())
+		} else {
+			espEditAplicar(app, app.editText())
+		}
 
 		return true
 	case vkEscape:
@@ -510,6 +584,10 @@ func espTecla(app *app, mensagem uint32, wparam uintptr) bool {
 		return false
 	}
 
+	if marbleTecla(app, uint32(wparam&espMascaraPalavra), uint32(wparam)) {
+		return true
+	}
+
 	tecla := uint32(wparam & espMascaraPalavra)
 	if tecla == vkDelete && espCanvas.editando < 0 {
 		espRemoverFoco()
@@ -518,17 +596,89 @@ func espTecla(app *app, mensagem uint32, wparam uintptr) bool {
 		return true
 	}
 
+	if espCanvas.editando >= 0 {
+		return false
+	}
+
+	return espAtalhosBoard(app, tecla)
+}
+
+func espAtalhosBoard(app *app, tecla uint32) bool {
+	ctrl := getKeyDown(vkControl)
+	shift := getKeyDown(vkShift)
+
+	if ctrl && shift && tecla == teclaTeclaO {
+		espCanvas.sliderVisivel = !espCanvas.sliderVisivel
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+
+		return true
+	}
+
+	if ctrl && shift && tecla == teclaTeclaB {
+		marbleAlternarFundo(app)
+
+		return true
+	}
+
+	if ctrl {
+		return espAtalhosCtrl(app, tecla, shift)
+	}
+
+	if shift {
+		return false
+	}
+
+	return espAtalhosSimples(app, tecla)
+}
+
+func espAtalhosCtrl(app *app, tecla uint32, shift bool) bool {
+	switch {
+	case tecla == vkTab && shift:
+		return boardNavegar(app, true)
+	case tecla == teclaTeclaZ:
+		return boardDesfazer(app)
+	case tecla == teclaTeclaY:
+		return boardRefazer(app)
+	}
+
 	return false
 }
 
-func espAbrirCard(app *app, indice int) bool {
+func espAtalhosSimples(app *app, tecla uint32) bool {
+	switch tecla {
+	case teclaTeclaT:
+		return boardTidy()
+	case vkTab:
+		return boardNavegar(app, false)
+	case teclaTeclaS:
+		return boardDobrar()
+	case teclaTeclaF:
+		return boardAjustarView(app)
+	case teclaTeclaN:
+		marbleCriarNota(app)
+
+		return true
+	case teclaTeclaW:
+		marbleNovaCard(app)
+
+		return true
+	case vkF9:
+		marbleModoDemo(app)
+
+		return true
+	}
+
+	return false
+}
+
+func espAbrirCard(app *app, indice int) {
 	if app == nil || indice < 0 || indice >= len(espCanvas.cartoes) {
-		return false
+		return
 	}
 
 	card := espCanvas.cartoes[indice]
 	if card.url == "" {
-		return false
+		return
 	}
 
 	espCanvas.aberto = indice
@@ -536,13 +686,11 @@ func espAbrirCard(app *app, indice int) bool {
 	if app.left == nil || app.left.wv == nil || !app.left.ready {
 		app.novaAba(card.url, true)
 
-		return true
+		return
 	}
 
 	app.left.wv.Navigate(card.url)
 	espPosicionarWebView(app)
-
-	return true
 }
 
 func espPosicionarWebView(app *app) {
@@ -592,7 +740,10 @@ func espPintarBarraURL(disp *d2dMotor, indice int) {
 		return
 	}
 
-	textoURL := espCanvas.cartoes[indice].url
+	textoURL := espCanvas.cartoes[indice].titulo
+	if textoURL == "" {
+		textoURL = espCanvas.cartoes[indice].url
+	}
 	if textoURL == "" {
 		textoURL = espURLPlaceholder
 	}
@@ -601,7 +752,7 @@ func espPintarBarraURL(disp *d2dMotor, indice int) {
 		areaURL.Left + espMargem, areaURL.Top,
 		areaURL.Right - espMargem, areaURL.Bottom,
 	}
-	disp.textoUI(textoURL, areaTexto, espCorDim, true, false)
+	espTextoHaloUI(disp, textoURL, areaTexto, espCorDim, true, false)
 }
 
 func espPintar(disp *d2dMotor, app *app) {
@@ -609,7 +760,17 @@ func espPintar(disp *d2dMotor, app *app) {
 		return
 	}
 
+	marblePintarWallpaper(disp, app)
+	if !marbleFundoFoto {
+		espPintarBrilho(disp, app)
+	}
+	marblePintarTrilhas(disp)
+
 	for indice, card := range espCanvas.cartoes {
+		if card.ehNota {
+			continue
+		}
+
 		corBorda := uint32(espBordaCard)
 		if indice == espCanvas.foco {
 			corBorda = espBordaFoco
@@ -617,11 +778,26 @@ func espPintar(disp *d2dMotor, app *app) {
 
 		espPintarBarraURL(disp, indice)
 		disp.redondo(card.rect, espCardRaio, espFundoCard, corBorda)
+
+		if card.temSticky {
+			lado := app.sc(24)
+			sticky := rectT{
+				card.rect.Right - lado - app.sc(4), card.rect.Bottom - lado - app.sc(4),
+				card.rect.Right - app.sc(4), card.rect.Bottom - app.sc(4),
+			}
+			disp.ret(sticky, 0xFF8AE6FD)
+		}
 	}
+
+	marblePintarNotas(disp, app)
 
 	if espCanvas.selecao.Width() > 0 && espCanvas.selecao.Height() > 0 {
 		disp.contorno(espCanvas.selecao, espCorSelecao)
 	}
 
-	espPintarSlider(disp, app)
+	if espCanvas.sliderVisivel {
+		espPintarSlider(disp, app)
+	}
+
+	marblePintar(disp, app)
 }

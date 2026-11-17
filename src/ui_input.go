@@ -1810,15 +1810,15 @@ func (a *app) audioRectAt(x, y int32) int {
 }
 
 func (a *app) onRButtonUp(x, y int32) {
-	if a.soIA || a.painelCheioAtivo() {
-		return
-	}
-
-	if y < 0 || y >= a.tabH || a.hitBotaoJanela(x, y) != winNenhum {
-		return
-	}
-
-	a.abrirMenuContextoAba(a.indiceAbaEmFaixa(x, y), x, y)
+	// Modo Marble: menu de contexto do board (original do OVERDRIVE preservado abaixo).
+	marbleAbrirMenuContexto(a, x, y)
+	// if a.soIA || a.painelCheioAtivo() {
+	// 	return
+	// }
+	// if y < 0 || y >= a.tabH || a.hitBotaoJanela(x, y) != winNenhum {
+	// 	return
+	// }
+	// a.abrirMenuContextoAba(a.indiceAbaEmFaixa(x, y), x, y)
 }
 
 // indiceAbaEmFaixa acha a aba sob o ponto; -1 = nenhuma.

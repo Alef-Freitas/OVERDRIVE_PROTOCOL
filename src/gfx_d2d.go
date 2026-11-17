@@ -26,10 +26,16 @@ type d2dFonteKey struct {
 	ah, av, wr int32
 }
 
+type d2dPincelAlfaKey struct {
+	cor  uint32
+	alfa uint8
+}
+
 type d2dMotor struct {
 	hwnd    uintptr
 	rt      *direct2d.ID2D1HwndRenderTarget
 	solidos map[uint32]*direct2d.ID2D1Brush
+	alfas   map[d2dPincelAlfaKey]*direct2d.ID2D1Brush
 	fontes  map[d2dFonteKey]*directwrite.IDWriteTextFormat
 	bmps    map[string]*direct2d.ID2D1Bitmap
 	bmpTam  int32
@@ -95,6 +101,12 @@ func (d *d2dMotor) soltar() {
 		}
 	}
 
+	for _, pincel := range d.alfas {
+		if pincel != nil {
+			pincel.Release()
+		}
+	}
+
 	for _, pincel := range d.bmps {
 		if pincel != nil {
 			pincel.Release()
@@ -113,6 +125,7 @@ func (d *d2dMotor) soltar() {
 	}
 
 	d.solidos = nil
+	d.alfas = nil
 	d.fontes = nil
 	d.bmps = nil
 	d.bmpTam = 0
@@ -178,6 +191,51 @@ func (d *d2dMotor) pincel(cor uint32) *direct2d.ID2D1Brush {
 	d.solidos[cor] = pincelBase
 
 	return pincelBase
+}
+
+// pincelAlfa devolve um pincel solido com alpha explicito (para glow e halo).
+func (d *d2dMotor) pincelAlfa(cor uint32, alfa uint8) *direct2d.ID2D1Brush {
+	if d.rt == nil {
+		return nil
+	}
+
+	if d.alfas == nil {
+		d.alfas = map[d2dPincelAlfaKey]*direct2d.ID2D1Brush{}
+	}
+
+	chave := d2dPincelAlfaKey{cor: cor, alfa: alfa}
+	if pincel, ok := d.alfas[chave]; ok {
+		return pincel
+	}
+
+	corF := d2dCorF(cor)
+	corF.A = float32(alfa) / alfaOpacoD2D
+
+	var pincelSolido *direct2d.ID2D1SolidColorBrush
+	if err := d.rt.CreateSolidColorBrush(&corF, nil, &pincelSolido); err != nil || pincelSolido == nil {
+		return nil
+	}
+
+	pincelBase := &pincelSolido.ID2D1Brush
+	d.alfas[chave] = pincelBase
+
+	return pincelBase
+}
+
+// elipseAlfa preenche uma elipse com alpha explicito.
+func (d *d2dMotor) elipseAlfa(area rectT, cor uint32, alfa uint8) {
+	if d.rt == nil || area.Width() <= 0 || area.Height() <= 0 {
+		return
+	}
+
+	if pincel := d.pincelAlfa(cor, alfa); pincel != nil {
+		elipse := direct2d.D2D1_ELLIPSE{
+			Point:   common.D2D_POINT_2F{X: float32(area.Left+area.Right) / meioD2D, Y: float32(area.Top+area.Bottom) / meioD2D},
+			RadiusX: float32(area.Width()) / meioD2D,
+			RadiusY: float32(area.Height()) / meioD2D,
+		}
+		d.rt.FillEllipse(&elipse, pincel)
+	}
 }
 
 func d2dGarantirWF() bool {
@@ -266,15 +324,11 @@ func (d *d2dMotor) aplicarReticencias(formatoTexto *directwrite.IDWriteTextForma
 	_ = formatoTexto.SetTrimming(&corte, sinal)
 }
 
-func (d *d2dMotor) texto(texto string, area rectT, cor uint32, face string, tamPx int32, alinhH, alinhV, quebra int32) {
-	if d.rt == nil || texto == "" || area.Width() <= 0 || area.Height() <= 0 {
-		return
-	}
-
-	formato := d.fonte(face, tamPx, alinhH, alinhV, quebra)
-
-	pincel := d.pincel(cor)
-	if formato == nil || pincel == nil {
+// desenharTexto emite o DrawText com formato e pincel ja resolvidos.
+func (d *d2dMotor) desenharTexto(
+	texto string, area rectT, formato *directwrite.IDWriteTextFormat, pincel *direct2d.ID2D1Brush,
+) {
+	if d.rt == nil || texto == "" || area.Width() <= 0 || area.Height() <= 0 || formato == nil || pincel == nil {
 		return
 	}
 
@@ -287,6 +341,41 @@ func (d *d2dMotor) texto(texto string, area rectT, cor uint32, face string, tamP
 	d.rt.DrawText(texto, uint32(total), formato, &areaF, pincel,
 		direct2d.D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT|direct2d.D2D1_DRAW_TEXT_OPTIONS_CLIP,
 		directwrite.DWRITE_MEASURING_MODE_NATURAL)
+}
+
+func (d *d2dMotor) texto(texto string, area rectT, cor uint32, face string, tamPx int32, alinhH, alinhV, quebra int32) {
+	if d.rt == nil || texto == "" || area.Width() <= 0 || area.Height() <= 0 {
+		return
+	}
+
+	formato := d.fonte(face, tamPx, alinhH, alinhV, quebra)
+	if formato == nil {
+		return
+	}
+
+	d.desenharTexto(texto, area, formato, d.pincel(cor))
+}
+
+// textoComHalo aplica o text-shadow de 3 camadas do html.float do Marble:
+// 0 0 2px, 0 0 6px e 0 0 12px na cor --ground, antes do texto principal.
+func (d *d2dMotor) textoComHalo(
+	texto string, area rectT, cor, corHalo uint32, face string, tamPx int32, alinhH, alinhV, quebra int32,
+) {
+	if d.rt == nil || texto == "" || area.Width() <= 0 || area.Height() <= 0 {
+		return
+	}
+
+	formato := d.fonte(face, tamPx, alinhH, alinhV, quebra)
+	if formato == nil {
+		return
+	}
+
+	for _, raio := range [...]int32{espHaloRaio1, espHaloRaio2, espHaloRaio3} {
+		halo := rectT{area.Left - raio, area.Top - raio, area.Right + raio, area.Bottom + raio}
+		d.desenharTexto(texto, halo, formato, d.pincelAlfa(corHalo, espHaloAlfa))
+	}
+
+	d.desenharTexto(texto, area, formato, d.pincel(cor))
 }
 
 func (d *d2dMotor) elipse(area rectT, cor uint32) {
@@ -310,6 +399,16 @@ func (d *d2dMotor) linha(iniX, iniY, fimX, fimY float32, esp float32) {
 	}
 
 	if pincel := d.pincel(corAccentSoft); pincel != nil {
+		d.rt.DrawLine(common.D2D_POINT_2F{X: iniX, Y: iniY}, common.D2D_POINT_2F{X: fimX, Y: fimY}, pincel, esp, nil)
+	}
+}
+
+func (d *d2dMotor) linhaCor(iniX, iniY, fimX, fimY float32, esp float32, cor uint32, alfa uint8) {
+	if d.rt == nil {
+		return
+	}
+
+	if pincel := d.pincelAlfa(cor, alfa); pincel != nil {
 		d.rt.DrawLine(common.D2D_POINT_2F{X: iniX, Y: iniY}, common.D2D_POINT_2F{X: fimX, Y: fimY}, pincel, esp, nil)
 	}
 }
@@ -2342,19 +2441,19 @@ func (a *app) paintD2D() {
 	disp := &d2dMain
 
 	recorte := a.clientRect()
-	if a.soIA {
-		a.drawSplitButtonD2D()
+	// Modo Marble Overdrive: o canvas espacial sempre pinta. Os early-returns
+	// do painel cheio/soIA do OVERDRIVE ficam desligados (codigo preservado abaixo).
+	// if a.soIA {
+	// 	a.drawSplitButtonD2D()
+	// 	return
+	// }
+	// if a.painelCheioAtivo() {
+	// 	a.paintEspacoAppsD2D(recorte)
+	// 	a.drawLeftAuxButtonD2D()
+	// 	return
+	// }
 
-		return
-	}
-
-	if a.painelCheioAtivo() {
-		a.paintEspacoAppsD2D(recorte)
-		a.drawLeftAuxButtonD2D()
-
-		return
-	}
-
+	_ = recorte
 	// a.paintFaixaD2D()
 	// fundoBarra := rectT{0, a.tabH, recorte.Right, a.tabH + a.tbHeight}
 	// disp.retB(fundoBarra, a.brChrome)
@@ -2375,7 +2474,6 @@ func (a *app) paintD2D() {
 	// a.drawImgToggleD2D()
 
 	espPintar(disp, a)
-	espPintarBotaoSair(disp, a)
 }
 
 // pularBotaoBarraD2D diz se o botao sai da barra principal.
