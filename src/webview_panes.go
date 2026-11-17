@@ -1556,17 +1556,21 @@ func (a *app) cuidarNovaJanelaWebView(p *pane, uri string, userInitiated bool) b
 		return true
 	}
 
-	if p == a.right {
-		a.depois(func() { a.escolherOndeAbrir(uri, p) })
-
+	// Modo Marble: window.open cria um card filho ao lado do card atual,
+	// ligado por uma aresta de trilha (comportamento original preservado abaixo).
+	if marbleSpawnDeLink(a, uri) {
 		return true
 	}
 
-	a.depois(func() {
-		a.novaAba(uri, false)
-		a.status = txtAbaFundo
-		a.invalidateBar()
-	})
+	// if p == a.right {
+	// 	a.depois(func() { a.escolherOndeAbrir(uri, p) })
+	// 	return true
+	// }
+	// a.depois(func() {
+	// 	a.novaAba(uri, false)
+	// 	a.status = txtAbaFundo
+	// 	a.invalidateBar()
+	// })
 
 	return true
 }
@@ -1949,6 +1953,7 @@ func (a *app) configurarAparenciaWebView(p *pane, w *WebView, mobile bool) {
 func (a *app) configurarScriptsBaseWebView(p *pane, w *WebView) {
 	w.SetZoomFactor(a.paneZoom(p))
 	w.AddInitScript(navHelperScript)
+	w.AddInitScript(marbleLinkScript)
 
 	if a.paneUsaDeepSeek(p) {
 		w.AddInitScript(idiomaScript())
