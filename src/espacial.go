@@ -93,6 +93,9 @@ type estadoEspacial struct {
 	alpha            uint32
 	arrastandoSlider bool
 	sliderVisivel    bool
+	moveu            bool
+	readMode         bool
+	rectAntesRead    rectT
 }
 
 //nolint:gochecknoglobals // Estado unico do canvas espacial: UI single-window.
@@ -135,6 +138,7 @@ func espIniciar() {
 
 	boardIniciar()
 	marbleIniciar()
+	marbleCarregarBoard()
 }
 
 func espRectValido(r rectT) bool {
@@ -436,6 +440,7 @@ func espMouseDown(app *app, x, y int32) {
 		}
 
 		espCanvas.movendo = true
+		espCanvas.moveu = false
 		espCanvas.origemX = x
 		espCanvas.origemY = y
 		espCanvas.cardOrigem = espCanvas.cartoes[indice].rect
@@ -474,6 +479,9 @@ func espMouseMove(app *app, x, y int32) {
 	if espCanvas.movendo {
 		dx := x - espCanvas.origemX
 		dy := y - espCanvas.origemY
+		if dx*dx+dy*dy > 9 {
+			espCanvas.moveu = true
+		}
 		origem := espCanvas.cardOrigem
 		espCanvas.cartoes[espCanvas.foco].rect = rectT{
 			origem.Left + dx, origem.Top + dy,
@@ -509,7 +517,11 @@ func espMouseUp(app *app, x, y int32) {
 
 	if espCanvas.movendo {
 		espCanvas.movendo = false
-		boardRegistrarMovimentoFoco()
+		if espCanvas.moveu {
+			boardRegistrarMovimentoFoco()
+		} else {
+			espAbrirCard(app, espCanvas.foco)
+		}
 
 		pReleaseCapture.Call()
 
@@ -641,6 +653,12 @@ func espAtalhosCtrl(app *app, tecla uint32, shift bool) bool {
 		return boardRefazer(app)
 	}
 
+	if tecla >= 0x31 && tecla <= 0x39 {
+		marbleTrocarSpace(app, int(tecla-0x31))
+
+		return true
+	}
+
 	return false
 }
 
@@ -664,6 +682,10 @@ func espAtalhosSimples(app *app, tecla uint32) bool {
 		return true
 	case vkF9:
 		marbleModoDemo(app)
+
+		return true
+	case vkReturn:
+		marbleAlternarReadMode(app)
 
 		return true
 	}

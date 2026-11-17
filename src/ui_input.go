@@ -75,6 +75,15 @@ func editProc(hwnd uintptr, msg uint32, wparam, lparam uintptr) uintptr {
 		}
 	case wmPaste, wmCut, wmClear, wmUndo:
 		app.invalidaEditCache()
+	}
+
+	if espEditAtivo && (msg == wmChar || msg == wmPaste || msg == wmCut ||
+		msg == wmClear || msg == wmUndo || msg == teclaRetrocesso) {
+		marbleAtualizarSugestoes(app.editText())
+		pInvalidateRect.Call(app.hwnd, 0, 1)
+	}
+
+	switch msg {
 	case wmSetFocus:
 		app.focarCampoEndereco(hwnd)
 	case wmKillFocus:

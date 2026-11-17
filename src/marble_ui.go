@@ -33,6 +33,7 @@ type marbleUIEstado struct {
 	menuY         int32
 	busca         string
 	linhaFoco     int
+	sugestoes     []string
 }
 
 //nolint:gochecknoglobals // Estado da UI single-window.
@@ -134,10 +135,57 @@ func marbleNomeSite(endereco string) string {
 	return host
 }
 
+func marbleAtualizarSugestoes(texto string) {
+	marbleUI.sugestoes = nil
+	if texto == "" {
+		return
+	}
+	minúsculo := strings.ToLower(texto)
+	for _, card := range espCanvas.cartoes {
+		if card.titulo == "" || card.ehNota {
+			continue
+		}
+		if strings.HasPrefix(strings.ToLower(card.titulo), minúsculo) {
+			marbleUI.sugestoes = append(marbleUI.sugestoes, card.titulo)
+		}
+	}
+}
+
+func marblePintarSugestoes(disp *d2dMotor, app *app) {
+	if espCanvas.editando < 0 || len(marbleUI.sugestoes) == 0 {
+		return
+	}
+
+	area := espAreaURL(espCanvas.editando)
+	if area.Width() <= 0 {
+		return
+	}
+
+	alturaItem := app.sc(26)
+	topo := area.Bottom + app.sc(4)
+	caixa := rectT{
+		area.Left, topo,
+		area.Right, topo + alturaItem*int32(len(marbleUI.sugestoes)),
+	}
+	disp.redondo(caixa, app.sc(6), marbleMenuFundo, espBordaCard)
+
+	for indice, sugestao := range marbleUI.sugestoes {
+		linha := rectT{
+			caixa.Left, topo + int32(indice)*alturaItem,
+			caixa.Right, topo + (int32(indice)+1)*alturaItem,
+		}
+		disp.textoUI(sugestao, rectT{
+			linha.Left + app.sc(10), linha.Top,
+			linha.Right - app.sc(8), linha.Bottom,
+		}, espCorDim, true, false)
+	}
+}
+
 func marblePintar(disp *d2dMotor, app *app) {
 	marblePintarSidebar(disp, app)
 	marblePintarPaleta(disp, app)
 	marblePintarMenu(disp, app)
+	marblePintarSugestoes(disp, app)
 }
 
 // marbleComandosFiltrados devolve so os comandos que casam com a busca.

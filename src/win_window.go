@@ -708,6 +708,8 @@ func (a *app) cuidarSistemaJanela(hwnd uintptr, msg uint32, wparam, lparam uintp
 	case wmCommand:
 		return 0, true
 	case wmClose:
+		marbleSalvarBoard()
+		marbleSalvarSpace(marbleEspacoAtual)
 		a.saveAndQuit()
 
 		return 0, true
