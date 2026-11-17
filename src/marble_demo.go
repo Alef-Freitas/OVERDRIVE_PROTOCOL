@@ -73,9 +73,12 @@ func marbleModoDemo(app *app) {
 
 	boardSincronizar()
 
-	// Conecta os cards da trilha (pai -> filho).
-	for indice := 1; indice < len(titulos); indice++ {
-		boardConectar(&boardAtivo, boardID(indice), boardID(indice+1), boardEdgeLink)
+	// Conecta os cards da trilha com os IDs reais atribuidos pelo boardSincronizar.
+	indicePrimeiroCard := len(espCanvas.cartoes) - len(titulos)
+	for indice := 0; indice < len(titulos)-1; indice++ {
+		idPai := espCanvas.cartoes[indicePrimeiroCard+indice].id
+		idFilho := espCanvas.cartoes[indicePrimeiroCard+indice+1].id
+		boardConectar(&boardAtivo, idPai, idFilho, boardEdgeLink)
 	}
 
 	marbleUI.sidebarAberta = false
